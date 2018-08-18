@@ -33,6 +33,8 @@ void yyerror(const char *s) {
 %token ENDL
 %token T_BF T_IT T_U
 %token BEGIN_CURLY END_CURLY
+%token BEGIN_TABULAR END_TABULAR
+%token TABLE_ARGS
 
 %%
 
@@ -91,6 +93,9 @@ CONTENT:
 		| CONTENT UNDERLINE
 		|
 		;
+
+TABLE:
+		BEGIN_TABULAR TABLE_ARGS ROWS END_TABULAR;
 
 %%
 #include <iostream>
