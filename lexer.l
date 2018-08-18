@@ -35,6 +35,13 @@ using namespace std;
 
 \\par 						{return PAR;}
 
+\\textbf 					{return T_BF;}
+
+\\textit					{return T_IT;}
+
+\\underline					{return T_U;}
+
+"}"							{return END_CURLY;}
 [a-zA-Z0-9 ]*	{
 					char *res = new char[strlen(yytext) + 1];
 					strcpy(res, yytext);

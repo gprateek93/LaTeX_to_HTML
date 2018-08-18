@@ -31,6 +31,8 @@ void yyerror(const char *s) {
 %token PAR
 %token ITEM
 %token ENDL
+%token T_BF T_IT T_U
+%token BEGIN_CURLY END_CURLY
 
 %%
 
@@ -69,10 +71,24 @@ ITEMS:
 		| ITEM CONTENT 
 		;
 
+TEXTBF:
+		T_BF CONTENT END_CURLY
+		;
+
+TEXTIT:
+		T_IT CONTENT END_CURLY
+		;
+
+UNDERLINE:
+		T_U CONTENT END_CURLY
+
 CONTENT:  
 		CONTENT LIST 
  		| CONTENT STRING
 		| CONTENT PAR
+		| CONTENT TEXTBF
+		| CONTENT TEXTIT
+		| CONTENT UNDERLINE
 		|
 		;
 
