@@ -1,6 +1,6 @@
 %option noyywrap
 
-%{ 
+%{
 #include <iostream>
 #include "parser.tab.h"
 using namespace std;
@@ -9,11 +9,11 @@ using namespace std;
 %}
 
 %x ENV_TABULAR
-$x TABLE_ARGUMENTS
+%x TABLE_ARGUMENTS
 
-%% 
+%%
 
-[ \t]+						; /* skip whitespace */ 
+[ \t]+						; /* skip whitespace */
 
 \n 							;
 
@@ -46,28 +46,39 @@ $x TABLE_ARGUMENTS
 "}"								{return END_CURLY;}
 
 "\\begin{tabular}"				{
-									BEGIN(TABLE_ARGUMENTS);
-									return BEGIN_TABULAR;
+									cout<<"Begin tabular\n";
+                                    BEGIN(TABLE_ARGUMENTS);
+                                    return BEGIN_TABULAR;
+                                }
+
+"\\end{tabular}"                {
+									return END_TABULAR;
 								}
 
-"\\end{tabular}"				{	return END_TABULAR;}
+<TABLE_ARGUMENTS>\{				{
+                            		return BEGIN_CURLY;
+                                }
 
-<TABLE_ARGUMENTS>"{"			{
-									return BEGIN_CURLY;
-								}
-
-<TABLE_ARGUMENTS>"[lcr][ lcr|]*"{
-									char *res = new char[strlen(yytext) + 1];
-									strcpy(res, yytext);
-									yylval.sval = res; // take this value when creating node
-									return TABLE_ARGS;
-								}
-
+<TABLE_ARGUMENTS>[lcr][ lcr|]*	{
+                                	char *resTemp = new char[strlen(yytext) + 1];
+                                    strcpy(resTemp, yytext);
+                                    char *res = new char[strlen(yytext) + 1];
+                                    int i=0, k=0;
+                                    while(resTemp[i]){
+                                        if(resTemp[i] == 'l' || resTemp[i] == 'c' || resTemp[i] == 'r'){
+                                            res[k++] = resTemp[i];
+                                        }
+                                        i++;
+                                    }
+                                    res[k] = 0;
+                                    yylval.sval = res;
+                                    return TABLE_ARGS;
+                                }
 
 <TABLE_ARGUMENTS>"}"			{
-									BEGIN(INITIAL);
-									return END_CURLY;
-								}
+                                	BEGIN(INITIAL);
+                                    return END_CURLY;
+                                }
 
 [a-zA-Z0-9 ]*					{
 									char *res = new char[strlen(yytext) + 1];
@@ -78,4 +89,4 @@ $x TABLE_ARGUMENTS
 
 .								;
 
-%% 
+%%

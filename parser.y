@@ -1,4 +1,4 @@
-%{ 
+%{
 #define YYDEBUG 1
 #include <iostream>
 using namespace std;
@@ -24,7 +24,7 @@ void yyerror(const char *s) {
 %token <ival> INT
 %token <fval> FLOAT
 %token <sval> STRING
-%token BEGIN_ITEMIZE END_ITEMIZE 
+%token BEGIN_ITEMIZE END_ITEMIZE
 %token BEGIN_ENUMERATE END_ENUMERATE
 %token BEGIN_DOCUMENT END_DOCUMENT
 %token SECTION SUBSECTION
@@ -40,7 +40,7 @@ void yyerror(const char *s) {
 
 S:
 		CONTENT
-		| S SEC 
+		| S SEC
 		;
 SEC:
 		SECTION CONTENT {cout<<"Sec reduced\n";}
@@ -51,26 +51,26 @@ SUBSEC:
 		| SUBSECTION CONTENT
 		;
 
-LIST:	
+LIST:
 		OL
 		| UL
 		;
 
-OL: 
-		BEGIN_ENUMERATE {cout<<"Begin OL\n";} 
-		ITEMS 
+OL:
+		BEGIN_ENUMERATE {cout<<"Begin OL\n";}
+		ITEMS
 		END_ENUMERATE {cout<<"End OL\n";}
 		;
 
-UL: 
-		BEGIN_ITEMIZE {cout<<"Begin UL\n";} 
-		ITEMS 
+UL:
+		BEGIN_ITEMIZE {cout<<"Begin UL\n";}
+		ITEMS
 		END_ITEMIZE {cout<<"End UL\n";}
 		;
 
-ITEMS: 
-		ITEMS ITEM CONTENT 
-		| ITEM CONTENT 
+ITEMS:
+		ITEMS ITEM CONTENT
+		| ITEM CONTENT
 		;
 
 TEXTBF:
@@ -84,18 +84,23 @@ TEXTIT:
 UNDERLINE:
 		T_U CONTENT END_CURLY
 
-CONTENT:  
-		CONTENT LIST 
+CONTENT:
+		CONTENT LIST
  		| CONTENT STRING
 		| CONTENT PAR
 		| CONTENT TEXTBF
 		| CONTENT TEXTIT
 		| CONTENT UNDERLINE
+		| CONTENT TABLE
 		|
 		;
 
 TABLE:
-		BEGIN_TABULAR TABLE_ARGS ROWS END_TABULAR;
+		BEGIN_TABULAR BEGIN_CURLY TABLE_ARGS END_CURLY ROWS END_TABULAR
+		;
+
+ROWS:
+		;
 
 %%
 #include <iostream>
@@ -104,12 +109,12 @@ TABLE:
 extern int yyparse();
 extern FILE *yyin;
 
-int main(int argc, char *argv[]) { 
+int main(int argc, char *argv[]) {
 	yyin = fopen(argv[1], "r");
-	
+
 	// parse through the input until there is no more:
 	do {
 		yyparse();
 	} while (!feof(yyin));
-	
+
 }
