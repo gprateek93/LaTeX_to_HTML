@@ -1,1 +1,31 @@
-\begin{tabular}{| lc   lc ||rrrr| }\end{tabular}
+\section
+
+Welcome to LaTeX Base, a web-based \LaTeX{} editor with live document preview!
+Here are some things to try --
+\subsection
+\begin{itemize}
+  \item edit the document name above by typing in the input field
+  \item make changes to the body on the left and watch the preview update
+  \item include an image by url like this one
+  \item check the compiler output by clicking the log button
+  \item format a mathematical expression like
+  \item \textbf{download} the document \underline{as} a pdf by selecting Export Local
+        Filesystem (or by clicking the desktop download button)
+  \item export your work to Dropbox or Google Drive
+  \item import an existing document from your local computer
+  \item try using the vim or emacs keyboard shortcuts
+\end{itemize}
+
+\section
+Lorem Ipsum lorem ipsum
+\subsection
+This is lorem ipsum
+\begin{tabular}{|l|c|r|}
+	\hline
+	First Item & Second Item & Third Item \\
+	\hline
+	Fourth Item & Fifth Item & Sixth Item \\
+	\hline
+\end{tabular}
+
+
