@@ -35,6 +35,7 @@ void yyerror(const char *s) {
 %token BEGIN_CURLY END_CURLY
 %token BEGIN_TABULAR END_TABULAR
 %token TABLE_ARGS
+%token AMPERSAND
 
 %%
 
@@ -104,7 +105,6 @@ ROWS:
 
 %%
 #include <iostream>
-
 // stuff from lex that yacc needs to know about:
 extern int yyparse();
 extern FILE *yyin;

@@ -7,15 +7,14 @@ using namespace std;
 
 
 %}
-
 %x ENV_TABULAR
 %x TABLE_ARGUMENTS
 
 %%
 
-[ \t]+						; /* skip whitespace */
+<*>[ \t]+						; /* skip whitespace */
 
-\n 							;
+\n 								;
 
 "\\begin{itemize}" 				{return BEGIN_ITEMIZE;}
 
@@ -37,11 +36,11 @@ using namespace std;
 
 \\par 							{return PAR;}
 
-\\textbf 						{return T_BF;}
+<INITIAL,ENV_TABULAR>\\textbf	{return T_BF;}
 
-\\textit						{return T_IT;}
+<INITIAL,ENV_TABULAR>\\textit	{return T_IT;}
 
-\\underline						{return T_U;}
+<INITIAL,ENV_TABULAR>\\underline{return T_U;}
 
 "}"								{return END_CURLY;}
 
@@ -59,7 +58,7 @@ using namespace std;
                             		return BEGIN_CURLY;
                                 }
 
-<TABLE_ARGUMENTS>[lcr][ lcr|]*	{
+<TABLE_ARGUMENTS>[ lcr|]*	{
                                 	char *resTemp = new char[strlen(yytext) + 1];
                                     strcpy(resTemp, yytext);
                                     char *res = new char[strlen(yytext) + 1];
@@ -80,7 +79,10 @@ using namespace std;
                                     return END_CURLY;
                                 }
 
-[a-zA-Z0-9 ]*					{
+<ENV_TABULAR>"&"				{
+									return AMPERSAND;
+								}
+<INITIAL,ENV_TABULAR>[a-zA-Z0-9 ]*{
 									char *res = new char[strlen(yytext) + 1];
 									strcpy(res, yytext);
 									yylval.sval = res;

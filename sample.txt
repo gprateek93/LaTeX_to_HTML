@@ -1,7 +1,6 @@
 \section
-
-Welcome to LaTeX Base, a web-based \LaTeX{} editor with live document preview!
-Here are some things to try --
+Welcome to LaTeX Base, a web-based editor with live document preview!
+Here are some things to try
 \subsection
 \begin{itemize}
   \item edit the document name above by typing in the input field
@@ -21,11 +20,5 @@ Lorem Ipsum lorem ipsum
 \subsection
 This is lorem ipsum
 \begin{tabular}{|l|c|r|}
-	\hline
-	First Item & Second Item & Third Item \\
-	\hline
-	Fourth Item & Fifth Item & Sixth Item \\
-	\hline
+
 \end{tabular}
-
-
