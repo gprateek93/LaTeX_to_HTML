@@ -1,5 +1,5 @@
 \section
-Welcome to LaTeX Base, a web-based editor with live document preview!
+Welcome to LaTeX Base a webbased editor with live document preview
 Here are some things to try
 \subsection
 \begin{itemize}
@@ -9,7 +9,7 @@ Here are some things to try
   \item check the compiler output by clicking the log button
   \item format a mathematical expression like
   \item \textbf{download} the document \underline{as} a pdf by selecting Export Local
-        Filesystem (or by clicking the desktop download button)
+        Filesystem or by clicking the desktop download button
   \item export your work to Dropbox or Google Drive
   \item import an existing document from your local computer
   \item try using the vim or emacs keyboard shortcuts
@@ -19,6 +19,16 @@ Here are some things to try
 Lorem Ipsum lorem ipsum
 \subsection
 This is lorem ipsum
-\begin{tabular}{|l|c|r|}
-
+\textbf{
+\begin{tabular}{l|c|r|r|r}
+\hline
+      1 & 11101 & a\\
+      \hline
+      2 & 101 & b\\
+      \hline
+      3 & \textbf{\textit{23113231}} & c\\
+      \hline
+      4 & 25113231 & \\
+      \hline
 \end{tabular}
+}

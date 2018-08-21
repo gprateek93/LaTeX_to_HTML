@@ -14,7 +14,7 @@ using namespace std;
 
 <*>[ \t]+                           ; /* skip whitespace */
 
-\n                                  ;
+<INITIAL,ENV_TABULAR>\n             ;
 
 "\\begin{itemize}"                  {
                                         return BEGIN_ITEMIZE;
@@ -56,19 +56,23 @@ using namespace std;
                                         return PAR;
                                     }
 
-<INITIAL,ENV_TABULAR>\\textbf       {
+<INITIAL,ENV_TABULAR>"\\textbf"     {
                                         return T_BF;
                                     }
 
-<INITIAL,ENV_TABULAR>\\textit       {
+<INITIAL,ENV_TABULAR>"\\textit"     {
                                         return T_IT;
                                     }
 
-<INITIAL,ENV_TABULAR>\\underline    {
+<INITIAL,ENV_TABULAR>"\\underline"  {
                                         return T_U;
                                     }
 
-"}"                                 {
+<INITIAL,ENV_TABULAR>"{"            {
+                                        return BEGIN_CURLY;
+                                    }
+
+<INITIAL,ENV_TABULAR>"}"            {
                                         return END_CURLY;
                                     }
 
@@ -78,7 +82,8 @@ using namespace std;
                                         return BEGIN_TABULAR;
                                     }
 
-"\\end{tabular}"                    {
+<ENV_TABULAR>"\\end{tabular}"       {
+                                        BEGIN(INITIAL);
                                         return END_TABULAR;
 								    }
 
@@ -103,13 +108,21 @@ using namespace std;
                                     }
 
 <TABLE_ARGUMENTS>"}"                {
-                                        BEGIN(INITIAL);
+                                        BEGIN(ENV_TABULAR);
                                         return END_CURLY;
                                     }
 
 <ENV_TABULAR>"&"                    {
 									   return AMPERSAND;
 								    }
+
+<INITIAL,ENV_TABULAR>\\\\			{
+                                    	return DSLASH;
+                                    }
+
+<ENV_TABULAR>"\\hline"              {
+                                        return HLINE;
+                                    }
 
 <INITIAL,ENV_TABULAR>[a-zA-Z0-9 ]*  {
     									char *res = new char[strlen(yytext) + 1];
@@ -118,6 +131,6 @@ using namespace std;
     									return STRING;
 								    }
 
-.                                   ;
+.                                   {cout<<"...";}
 
 %%
