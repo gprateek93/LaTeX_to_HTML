@@ -12,83 +12,112 @@ using namespace std;
 
 %%
 
-<*>[ \t]+						; /* skip whitespace */
+<*>[ \t]+                           ; /* skip whitespace */
 
-\n 								;
+\n                                  ;
 
-"\\begin{itemize}" 				{return BEGIN_ITEMIZE;}
-
-"\\end{itemize}" 				{return END_ITEMIZE;}
-
-"\\begin{enumerate}"			{return BEGIN_ENUMERATE;}
-
-"\\end{enumerate}"				{return END_ENUMERATE;}
-
-"\\begin{document}"				{return BEGIN_DOCUMENT;}
-
-"\\end{document}"				{return END_DOCUMENT;}
-
-"\\section"						{return SECTION;}
-
-\\subsection					{return SUBSECTION;}
-
-\\item 							{return ITEM;}
-
-\\par 							{return PAR;}
-
-<INITIAL,ENV_TABULAR>\\textbf	{return T_BF;}
-
-<INITIAL,ENV_TABULAR>\\textit	{return T_IT;}
-
-<INITIAL,ENV_TABULAR>\\underline{return T_U;}
-
-"}"								{return END_CURLY;}
-
-"\\begin{tabular}"				{
-									cout<<"Begin tabular\n";
-                                    BEGIN(TABLE_ARGUMENTS);
-                                    return BEGIN_TABULAR;
-                                }
-
-"\\end{tabular}"                {
-									return END_TABULAR;
-								}
-
-<TABLE_ARGUMENTS>\{				{
-                            		return BEGIN_CURLY;
-                                }
-
-<TABLE_ARGUMENTS>[ lcr|]*	{
-                                	char *resTemp = new char[strlen(yytext) + 1];
-                                    strcpy(resTemp, yytext);
-                                    char *res = new char[strlen(yytext) + 1];
-                                    int i=0, k=0;
-                                    while(resTemp[i]){
-                                        if(resTemp[i] == 'l' || resTemp[i] == 'c' || resTemp[i] == 'r'){
-                                            res[k++] = resTemp[i];
-                                        }
-                                        i++;
+"\\begin{itemize}"                  {
+                                        return BEGIN_ITEMIZE;
                                     }
-                                    res[k] = 0;
-                                    yylval.sval = res;
-                                    return TABLE_ARGS;
-                                }
 
-<TABLE_ARGUMENTS>"}"			{
-                                	BEGIN(INITIAL);
-                                    return END_CURLY;
-                                }
+"\\end{itemize}"                    {
+                                        return END_ITEMIZE;
+                                    }
 
-<ENV_TABULAR>"&"				{
-									return AMPERSAND;
-								}
-<INITIAL,ENV_TABULAR>[a-zA-Z0-9 ]*{
-									char *res = new char[strlen(yytext) + 1];
-									strcpy(res, yytext);
-									yylval.sval = res;
-									return STRING;
-								}
+"\\begin{enumerate}"			    {
+                                        return BEGIN_ENUMERATE;
+                                    }
 
-.								;
+"\\end{enumerate}"				    {
+                                        return END_ENUMERATE;
+                                    }
+
+"\\begin{document}"                 {
+                                        return BEGIN_DOCUMENT;
+                                    }
+
+"\\end{document}"                   {
+                                        return END_DOCUMENT;
+                                    }
+
+"\\section"                         {
+                                        return SECTION;
+                                    }
+
+"\\subsection"                      {
+                                        return SUBSECTION;
+                                    }
+
+"\\item"                            {
+                                        return ITEM;
+                                    }
+
+"\\par"                             {
+                                        return PAR;
+                                    }
+
+<INITIAL,ENV_TABULAR>\\textbf       {
+                                        return T_BF;
+                                    }
+
+<INITIAL,ENV_TABULAR>\\textit       {
+                                        return T_IT;
+                                    }
+
+<INITIAL,ENV_TABULAR>\\underline    {
+                                        return T_U;
+                                    }
+
+"}"                                 {
+                                        return END_CURLY;
+                                    }
+
+"\\begin{tabular}"                  {
+    									cout<<"Begin tabular\n";
+                                        BEGIN(TABLE_ARGUMENTS);
+                                        return BEGIN_TABULAR;
+                                    }
+
+"\\end{tabular}"                    {
+                                        return END_TABULAR;
+								    }
+
+<TABLE_ARGUMENTS>\{				    {
+                                        return BEGIN_CURLY;
+                                    }
+
+<TABLE_ARGUMENTS>[ lcr|]*	        {
+                                    	char *resTemp = new char[strlen(yytext) + 1];
+                                        strcpy(resTemp, yytext);
+                                        char *res = new char[strlen(yytext) + 1];
+                                        int i=0, k=0;
+                                        while(resTemp[i]){
+                                            if(resTemp[i] == 'l' || resTemp[i] == 'c' || resTemp[i] == 'r'){
+                                                res[k++] = resTemp[i];
+                                            }
+                                            i++;
+                                        }
+                                        res[k] = 0;
+                                        yylval.sval = res;
+                                        return TABLE_ARGS;
+                                    }
+
+<TABLE_ARGUMENTS>"}"                {
+                                        BEGIN(INITIAL);
+                                        return END_CURLY;
+                                    }
+
+<ENV_TABULAR>"&"                    {
+									   return AMPERSAND;
+								    }
+
+<INITIAL,ENV_TABULAR>[a-zA-Z0-9 ]*  {
+    									char *res = new char[strlen(yytext) + 1];
+    									strcpy(res, yytext);
+    									yylval.sval = res;
+    									return STRING;
+								    }
+
+.                                   ;
 
 %%
