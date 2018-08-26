@@ -9,12 +9,14 @@ using namespace std;
 %}
 %x ENV_TABULAR
 %x TABLE_ARGUMENTS
+%x ENV_FIGURE
+%X FIGURE_ARGUMENTS
 
 %%
 
 <*>[ \t]+                           ; /* skip whitespace */
 
-<INITIAL,ENV_TABULAR>\n             ;
+<INITIAL,ENV_TABULAR,ENV_FIGURE>\n             ;
 
 "\\begin{itemize}"                  {
                                         return BEGIN_ITEMIZE;
@@ -124,12 +126,71 @@ using namespace std;
                                         return HLINE;
                                     }
 
-<INITIAL,ENV_TABULAR>[a-zA-Z0-9 ]*  {
+<INITIAL,ENV_TABULAR,ENV_FIGURE>[a-zA-Z0-9 ]*  {
     									char *res = new char[strlen(yytext) + 1];
     									strcpy(res, yytext);
     									yylval.sval = res;
     									return STRING;
 								    }
+"\\begin{figure}"                   {
+                                        cout<<"begin figure"<<endl;
+                                        BEGIN(ENV_FIGURE);
+                                        return BEGIN_FIGURE;
+                                    }
+
+<ENV_FIGURE>"\\end{figure}"         {
+                                        BEGIN(INITIAL);
+                                        return END_FIGURE;
+                                    }
+
+<INITIAL,ENV_FIGURE>"\\includegraphics" {
+                                        return INCLUDE_GRAPHICS;
+                                    }
+
+<INITIAL,ENV_FIGURE>"["             {
+                                        BEGIN(FIGURE_ARGUMENTS);
+                                        return BEGIN_SQUARE;
+                                    }
+<INITIAL,ENV_FIGURE>"{"             {
+                                        return BEGIN_CURLY;
+                                    }
+
+<INITIAL,ENV_FIGURE>"}"             {
+                                        return END_CURLY;
+                                    }
+
+<ENV_FIGURE>"\\caption"             {
+                                        return CAPTION;
+                                    }
+
+<INITIAL,ENV_FIGURE>"\\centering"   {
+                                        return CENTERING;
+                                    }
+
+<FIGURE_ARGUMENTS>[a-z=. 0-9]+       {
+                                        char *res = new char[strlen(yytext)+1];
+                                        strcpy(res, yytext);
+                                        string test = "";
+                                        int i = 0;
+                                        while(res[i]==' '){
+                                            i++;
+                                        }
+                                        while(res[i]!='=' && res[i]!=' '){
+                                            test+=res[i++];
+                                        }
+                                        if(test == "width" || test == "height" || test == "scale" || test == "angle"){
+                                            return FIG_ARGS;
+                                        }
+                                    }
+
+<FIGURE_ARGUMENTS>,                 {
+                                        return COMMA;
+                                    }
+
+<FIGURE_ARGUMENTS>"]"               {
+                                        BEGIN(ENV_FIGURE);
+                                        return END_SQUARE;
+                                    }
 
 .                                   {cout<<"...";}
 
