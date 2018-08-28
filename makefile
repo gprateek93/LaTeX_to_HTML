@@ -1,8 +1,8 @@
-parser.tab.c parser.tab.h: parser.y
-	@bison -d parser.y
+compiler: main.cpp lex.yy.c parser.tab.c 
+	@g++ main.cpp lex.yy.c parser.tab.c ast.cpp -o compiler
+parser.tab.c parser.tab.h: ast.cpp parser.y
+	@bison -dv parser.y
 lex.yy.c: lexer.l parser.tab.h
 	@flex lexer.l
-compiler: main.cpp lex.yy.c parser.tab.c
-	@g++ main.cpp lex.yy.c parser.tab.c -o compiler
 clean:
 	@rm -f compiler parser.tab.c parser.tab.h lex.yy.c parser.output

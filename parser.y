@@ -1,28 +1,60 @@
 %{
 #define YYDEBUG 1
 #include <iostream>
+#include <vector>
+#include <cstring>
+#include "ast.h"
+
 using namespace std;
 
 extern int yylex();
-int item_no = 0;
-void yyerror(const char *s) {
-	cout<<"Parse error!  Message:"<<s<<endl;
-	// might as well halt now:
-	exit(-1);
+extern void yyerror(const char*);
+
+vector<ast_node*> *section_children;
+vector<ast_node*> *subsection_children;
+vector<ast_node*> *content_children;
+vector<ast_node*> *list_children;
+vector<ast_node*> *r_content_children;
+
+
+void init_content_children(){
+	content_children = new vector<ast_node*>();
+}
+
+void adopt_content_children(ast_node* current){
+	current->children = *content_children;
+	init_content_children();
+}
+
+void init_list_children(){
+	list_children = new vector<ast_node*>();
+}
+
+void adopt_list_children(ast_node* current){
+	current->children = *list_children;
+	init_list_children();
+}
+
+void print(ast_node* root){
+	if(root == NULL){
+		return;
+	}
+	cout<<root->node_type<<endl;
+	for(int i=0; i<root->children.size(); i++){
+		print(root->children.at(i));
+	}
 }
 
 %}
 
 %union {
-	int ival;
-	float fval;
-	char *sval;
+	char* sval;
+	ast_node* node;
 }
 
-%start S
+%start START
 
-%token <ival> INT
-%token <fval> FLOAT
+%type <node> S LIST UNDERLINE TEXTIT TEXTBF TABLE SEC OL UL
 %token <sval> STRING
 %token BEGIN_ITEMIZE END_ITEMIZE
 %token BEGIN_ENUMERATE END_ENUMERATE
@@ -40,13 +72,41 @@ void yyerror(const char *s) {
 
 %%
 
+START:
+		S
+		/*
+			Call LATEX_TO_HTML from here
+			Append content children and section children
+			extern ast_root assign to this
+		*/
+		;
+
 S:
 		CONTENT
+		{
+			$$ = new_node();
+			adopt_content_children($$);
+			$$->node_type = DOCUMENT_H;
+			print($$);
+		}
 		| S SEC
 		;
+
 SEC:
-		SECTION CONTENT {cout<<"Sec reduced\n";}
-		| SECTION CONTENT SUBSEC {cout<<"SEC SUBSEC\n";}
+		SECTION CONTENT
+		{
+			ast_node* temp = new_node();
+			adopt_content_children(temp);
+			temp->node_type = SECTION_H;
+			//section_children->push_back(temp);
+		}
+		| SECTION CONTENT SUBSEC
+		{
+			ast_node* temp = new_node();
+			adopt_content_children(temp);
+			temp->node_type = SECTION_H;
+			//section_children->push_back(temp); add subsection part
+		}
 		;
 SUBSEC:
 		SUBSEC SUBSECTION CONTENT
@@ -59,41 +119,91 @@ LIST:
 		;
 
 OL:
-		BEGIN_ENUMERATE {cout<<"Begin OL\n";}
-		ITEMS
-		END_ENUMERATE {cout<<"End OL\n";}
+		BEGIN_ENUMERATE ITEMS END_ENUMERATE 
+		{	
+			$$ = new_node();
+			$$->node_type = ENUMERATE_H;
+			adopt_list_children($$);
+		}
 		;
 
 UL:
-		BEGIN_ITEMIZE {cout<<"Begin UL\n";}
-		ITEMS
-		END_ITEMIZE {cout<<"End UL\n";}
+		BEGIN_ITEMIZE ITEMS END_ITEMIZE
+		{	
+			$$ = new_node();
+			$$->node_type = ITEMIZE_H;
+			adopt_list_children($$);
+		}
 		;
 
 ITEMS:
 		ITEMS ITEM CONTENT
+		{
+			ast_node* temp = new_node();
+			adopt_content_children(temp);
+			temp->node_type = ITEM_H;
+			list_children->push_back(temp);
+		}
 		| ITEM CONTENT
+		{
+			ast_node* temp = new_node();
+			adopt_content_children(temp);
+			temp->node_type = ITEM_H;
+			list_children->push_back(temp);
+		}
 		;
 
 TEXTBF:
 		T_BF BEGIN_CURLY CONTENT END_CURLY
+		{
+			$$ = new_node();
+			$$->node_type = TEXTBF_H;
+			adopt_content_children($$);
+		}
 		;
 
 TEXTIT:
 		T_IT BEGIN_CURLY CONTENT END_CURLY
+		{
+			$$ = new_node();
+			$$->node_type = TEXTIT_H;
+			adopt_content_children($$);
+		}
 		;
 
 UNDERLINE:
 		T_U BEGIN_CURLY CONTENT END_CURLY
+		{
+			$$ = new_node();
+			$$->node_type = UNDERLINE_H;
+			adopt_content_children($$);
+		}
+		;
 
 CONTENT:
-		CONTENT LIST
- 		| CONTENT STRING
+		CONTENT LIST 				{
+										content_children->push_back($2);
+									}
+ 		| CONTENT STRING			{
+										ast_node* temp = new_node();
+										string str($2);
+										temp->data = str;
+										temp->node_type = STRING_H;
+										content_children->push_back(temp);
+									}
 		| CONTENT PAR
-		| CONTENT TEXTBF
-		| CONTENT TEXTIT
-		| CONTENT UNDERLINE
-		| CONTENT TABLE
+		| CONTENT TEXTBF 			{
+										content_children->push_back($2);
+									}
+		| CONTENT TEXTIT 			{
+										content_children->push_back($2);
+									}
+		| CONTENT UNDERLINE 		{
+										content_children->push_back($2);
+									}
+		| CONTENT TABLE 			{
+										content_children->push_back($2);
+									}
 		| CONTENT FIGURE
 		| CONTENT CENTERING
 		|
@@ -101,6 +211,10 @@ CONTENT:
 
 TABLE:
 		BEGIN_TABULAR BEGIN_CURLY TABLE_ARGS END_CURLY HLINE ROWS END_TABULAR
+		{
+			$$ = new_node();
+			$$->node_type = TABULAR_H;
+		}
 		;
 
 
