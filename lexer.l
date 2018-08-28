@@ -2,6 +2,7 @@
 
 %{
 #include <iostream>
+#include "ast.h"
 #include "parser.tab.h"
 using namespace std;
 int prev_state = 0;
