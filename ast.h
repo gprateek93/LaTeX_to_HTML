@@ -12,11 +12,6 @@ enum AST_Node_Type{
 	PAR_H, LABEL_H, REF_H, TABULAR_H, FIGURE_H, INCLUDE_GRAPHICS_H, CAPTION_H, STRING_H, DOCUMENT_H
 };
 
-
-/*
-	AST Node Structure
-*/
-
 typedef struct ast_node{
 	AST_Node_Type node_type;
 	string data;
