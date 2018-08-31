@@ -1,5 +1,7 @@
 #include <iostream>
+#include <string>
 #include "ast.h"
+#include "converter.h"
 
 // stuff from lex that yacc needs to know about:
 using namespace std;
@@ -38,5 +40,7 @@ int main(int argc, char *argv[]) {
 		yyparse();
 	} while (!feof(yyin));
 	print(root,0);
-	
+	converter C;
+	string s = C.traversal(root);
+	C.printHTML(s);
 }

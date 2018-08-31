@@ -1,7 +1,6 @@
 \section
 Welcome to LaTeX Base a webbased editor with live document preview
 Here are some things to try
-\subsection
 \begin{itemize}
   \item edit the document name above by typing in the input field
 \end{itemize}
@@ -22,7 +21,7 @@ This is lorem ipsum
       \hline
 \end{tabular}
 }
-
+\subsection
 \begin{figure}
 \includegraphics[height = 1cm]{hello}
 \caption{HELLO}
@@ -35,20 +34,20 @@ Welcome to LaTeX Base a webbased editor with live document preview
 Here are some things to try
 \textbf{this is some \underline{This is}}
 \section
-content 
+content
 \subsection
 Welcome to LaTeX Base a webb
-ased editor with live document 
+ased editor with live document
 preview
 Here are some things to try
 THis
 \begin{itemize}
-  \item 
-        \begin{enumerate} 
-              \item 
-                    this 
-              \item 
-                  that 
+  \item
+        \begin{enumerate}
+              \item
+                    this
+              \item
+                  that
         \end{enumerate}
   \item \textbf{}
 \end{itemize}
@@ -57,12 +56,12 @@ this that
 \subsection
 kya baat
 \begin{itemize}
-  \item 
-        \begin{enumerate} 
-              \item 
-                    this 
-              \item 
-                  that 
+  \item
+        \begin{enumerate}
+              \item
+                    this
+              \item
+                  that
         \end{enumerate}
   \item \textbf{}
 \end{itemize}
@@ -73,4 +72,3 @@ kya baat
      third & fourth\\
      \hline
 \end{tabular}
-
