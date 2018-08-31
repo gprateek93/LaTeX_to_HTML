@@ -16,6 +16,7 @@ extern void init_rows_children();
 extern void init_r_content_children();
 extern void init_cell_children();
 extern void init_figure_children();
+extern void init_math_children();
 extern void print(ast_node*, int);
 
 ast_node* root;
@@ -36,6 +37,7 @@ int main(int argc, char *argv[]) {
 	init_r_content_children();
 	init_cell_children();
 	init_figure_children();
+	init_math_children();
 	// parse through the input until there is no more:
 	do {
 		yyparse();

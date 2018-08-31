@@ -1,14 +1,5 @@
 \section
-Welcome to LaTeX Base a webbased editor with live document preview
-Here are some things to try
-\begin{itemize}
-  \item edit the document name above by typing in the input field
-\end{itemize}
-\section{}
-Lorem Ipsum lorem ipsum
-\subsection
-This is lorem ipsum
-\textbf{ eVERYTHING INSIDE THIS IS BOLD
+
 \begin{tabular}{l|c|r|r|r}
 \hline
       1 & 11101 & a\\
@@ -17,10 +8,10 @@ This is lorem ipsum
       \hline
       3 & \textbf{\textit{23113$  $231}} & c\\
       \hline
-      4 & 25113231 & $  $\\
+      4 & 25113231 & $ \sum_{6}^{t} $\\
       \hline
 \end{tabular}
-}
+
 \subsection
 \begin{figure}
 \includegraphics[height = 1cm]{hello}
