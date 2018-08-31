@@ -5,4 +5,4 @@ parser.tab.c parser.tab.h: ast.cpp parser.y
 lex.yy.c: lexer.l parser.tab.h
 	@flex lexer.l
 clean:
-	@rm -f compiler parser.tab.c parser.tab.h lex.yy.c parser.output
+	@rm -f compiler parser.tab.c parser.tab.h lex.yy.c parser.output output.html

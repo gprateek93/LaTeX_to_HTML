@@ -38,6 +38,11 @@ converter :: converter(){
     myMapping[16] = "body";
     myMapping[17] = "tr";
     myMapping[18] = "td";
+    myMapping[19] = "";
+    myMapping[20] = "&radic;";
+    myMapping[21] = "";
+    myMapping[22] = "&sum;";
+    myMapping[23] = "&int;";
 }
 
 string converter :: traverseSection(ast_node * root, int type){
@@ -68,6 +73,7 @@ string converter :: traverseList(ast_node * root, int type){
 string converter :: traverseFont(ast_node * root, int type){
     return traverseDefault(root,type);
 }
+
 string converter :: traversePara(ast_node * root, int type){
     string s = "";
     s+="<"+getMapping(type)+">";
@@ -75,6 +81,7 @@ string converter :: traversePara(ast_node * root, int type){
     s+=traverseChildren(root);
     return s;
 }
+
 string converter :: traverseAnchor(ast_node * root, int type){
     string s = "";
     return s;
@@ -98,6 +105,22 @@ string converter :: traverseImage(ast_node * root, int type){
 
 string converter :: traverseContent(ast_node * root, int type){
     return root->data;
+}
+
+string converter :: traverseMath(ast_node *root, int type){
+    string s = "";
+    if(type == 22 || type == 23){
+        cout<<"here"<<endl;
+        s+="<sub>" + root->data + "</sub>" + getMapping(type) + "<sup>" + root->data + "</sup>";
+    }
+    else if(type == 20){
+        s+=getMapping(type)+root->data;
+    }
+    else if(type == 21){
+        s+="("+root->data+")/("+root->attributes+")";
+    }
+    s+=traverseChildren(root);
+    return s;
 }
 
 string converter :: traverseDefault(ast_node * root, int type){
@@ -159,56 +182,16 @@ string converter :: traversal(ast_node *root){
             case 15:
                 s+=traverseContent(root,type);
                 break;
+            case 19:
+            case 20:
+            case 21:
+            case 22:
+            case 23:
+                s+=traverseMath(root,type);
+                break;
             default:
                 s+=traverseDefault(root,type);
         }
-        //opening
-        /*if(attributes.empty()){
-            //cout<<f
-            if(type!=15){
-                s += "<"+myMapping[type]+">";
-            }
-        }
-        else if(!attributes.empty() && emptyTags.find(type)!=emptyTags.end()){
-            s+="<"+myMapping[type];
-        }
-        else if(!attributes.empty() && emptyTags.find(type)==emptyTags.end()){
-            s+="<"+myMapping[type]+" id = #"+attributes+">";
-        }
-        if(type==0 || type == 1){
-            if(type == 0){
-                section_no++;
-                subsection_no = 0;
-                s+=myString(section_no);
-            }
-            if(type == 1){
-                subsection_no++;
-                s+=myString(section_no)+"."+myString(subsection_no);
-            }
-            s+="</"+myMapping[type]+">";
-        }
-        for(int i = 0; i<root->children.size(); i++){
-            s += traversal(root->children[i]);
-        }
-        switch(type){
-            case 13:
-                s+=" src="+attributes;
-                break;
-            case 15:
-                s+=data;
-                break;
-            default:
-                ;
-        }
-        //ending
-        if(emptyTags.find(type)==emptyTags.end()){
-            if(type!=15 && type!=0 && type!=1)
-            s+="</"+myMapping[type]+">";
-        }
-        else{
-            s+=">";
-        }
-    }*/
     }
     return s;
  }

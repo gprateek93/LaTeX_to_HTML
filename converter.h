@@ -23,6 +23,7 @@ class converter{
         string traverseImage(ast_node *root, int type);
         string traverseDefault(ast_node *root, int type);
         string traverseContent(ast_node *root, int type);
+        string traverseMath(ast_node *root, int type);
         string traverseChildren(ast_node *root);
         void printHTML(string s);
         string getMapping(int type);

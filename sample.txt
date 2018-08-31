@@ -4,9 +4,9 @@ Here are some things to try
 \begin{itemize}
   \item edit the document name above by typing in the input field
 \end{itemize}
-\section{}
+\section{dello}
 Lorem Ipsum lorem ipsum
-\par
+
 asfduekfewfjewihbkw
 \subsection
 This is lorem ipsum
@@ -22,7 +22,7 @@ This is lorem ipsum
       4 & 25113231 & $ \sum_{6}^{t} $\\
       \hline
 \end{tabular}
-
+}
 \subsection
 \begin{figure}
 \includegraphics[height = 1cm]{hello}
