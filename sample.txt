@@ -1,12 +1,12 @@
-\section
+\section{LLASSUN}
 Welcome to LaTeX Base $      $ a webbased editor with live document preview
 Here are some things to try
-\subsection $  $
+\subsection{NO LASSUN}
 \begin{itemize}
   \item edit the document name above by typing in the input field
   \item make changes to $  $ $  $ the body on the left and watch the preview update
   \item include an image by url like this one
-  \item check the compiler output by clicking the log button
+  \item check the compiler output by clicking the log button $ \sqrt{x^2} $
   \item format a mathematical expression like
   \item \textbf{download} the document \underline{as} a pdf by selecting Export Local
         Filesystem or by clicking the desktop download button
@@ -14,9 +14,9 @@ Here are some things to try
   \item import an existing document from your local computer
   \item try using the vim or emacs keyboard shortcuts
 \end{itemize}
-\section
+\section{}
 Lorem Ipsum $  $lorem ipsum
-\subsection
+\subsection{SOMETHING$x^2$}
 This is lorem ipsum
 \textbf{ eVERYTHING INSIDE THIS IS BOLD
 \begin{tabular}{l|c|r|r|r}
@@ -32,6 +32,7 @@ This is lorem ipsum
 \end{tabular}
 }
 
+$\frac{\sum_{i=0}^{n}x^2}{\int_{2}^{qw3} x^2 dx}$
 \centering
 This will change the justification to center
 \begin{figure}

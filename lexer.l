@@ -17,9 +17,11 @@ int prev_state = 0;
 %x FIGURE_ARGUMENTS
 %x MATHMODE
 
+OPERATORS [+*\-/^=]
+
 %%
 
-<*>[ \t]+                           ; /* skip whitespace */
+<*>[ \t]+ ; /* skip whitespace */
 
 <INITIAL,ENV_TABULAR,ENV_FIGURE>\n  ;
 
@@ -75,16 +77,16 @@ int prev_state = 0;
                                         return T_U;
                                     }
 
-<INITIAL,ENV_TABULAR>"{"            {
+<INITIAL,ENV_TABULAR,MATHMODE>"{"   {
                                         return BEGIN_CURLY;
                                     }
 
-<INITIAL,ENV_TABULAR>"}"            {
+<INITIAL,ENV_TABULAR,MATHMODE>"}"   {
                                         return END_CURLY;
                                     }
 
 "\\begin{tabular}"                  {
-    									cout<<"Begin tabular\n";
+    									/*cout<<"Begin tabular\n";*/
                                         BEGIN(TABLE_ARGUMENTS);
                                         prev_state = -1;
                                         return BEGIN_TABULAR;
@@ -141,7 +143,7 @@ int prev_state = 0;
     									return STRING;
 								    }
 "\\begin{figure}"                   {
-                                        cout << "begin figure" << endl;
+                                        /*cout << "begin figure" << endl;*/
                                         BEGIN(ENV_FIGURE);
                                         prev_state = 2;
                                         return BEGIN_FIGURE;
@@ -206,13 +208,50 @@ int prev_state = 0;
 
 <INITIAL,ENV_TABULAR,ENV_FIGURE>"$" {
                                         BEGIN(MATHMODE);
-                                        cout << "entered mathmode" << endl;
+                                        /*cout << "entered mathmode" << endl;*/
                                         return DOLLAR;
                                     }
 
+<MATHMODE>"\\sum"                   {
+                                        return SUMMATION;
+                                    }
+
+<MATHMODE>"\\int"                   {
+                                        return INTEGRAL;
+                                    }
+
+<MATHMODE>"\\frac"                  {
+                                        return FRACTION;
+                                    }
+
+<MATHMODE>"\\sqrt"                  {
+                                        return SQUARE_ROOT;
+                                    }
+
+<MATHMODE>\^                        {
+                                        /*it means superscript in latex
+                                          but current it is used only
+                                          for \int and \sum tags in this grammar */
+                                        return SUPERSCRIPT;
+                                    }
+
+<MATHMODE>\_                        {
+                                        /*it means subscript in latex
+                                          but current it is used only
+                                          for \int and \sum tags in this grammar*/
+                                        return SUBSCRIPT;
+                                    }
+<MATHMODE>([A-Za-z.0-9]|{OPERATORS})*   {
+                                            char *res = new char[strlen(yytext) + 1];
+                                            strcpy(res, yytext);/* You still have to take care of spacing*/
+                                            yylval.sval = res;
+                                            /*cout << "Mathstring found!!  " << res << endl;*/
+                                            return MATH_STRING;
+                                        }
+
 <MATHMODE>"$"                       {
-                                        cout << "prev State = " << prev_state << endl;
-                                        cout << "leaving math mode" << endl;
+                                        /*cout << "prev State = " << prev_state << endl;
+                                        cout << "leaving math mode" << endl;*/
                                         switch(prev_state)
                                         {
                                             case 0: BEGIN(INITIAL); prev_state = 0; break;
@@ -223,6 +262,7 @@ int prev_state = 0;
 
                                         return DOLLAR;
                                     }
+
 
 
 .                                   {cout<<"...";}
