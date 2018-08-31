@@ -34,16 +34,15 @@ void init_content_children(){
 }
 
 void adopt_content_children(ast_node* current){
-	//cout<<"Parent"<<current->node_type<<" Size "<<content_children->size()<<endl;
 	current->children = *content_children;
 	if(!content_stack.empty()){
 		*content_children = content_stack.top();
 		content_stack.pop();
+
 	}
 }
 
 void make_new_content(){
-	//cout<<"New content children\n";
 	content_stack.push(*content_children);
 	init_content_children();
 }
@@ -53,7 +52,6 @@ void init_list_children(){
 }
 
 void adopt_list_children(ast_node* current){
-	//cout<<"Parent list "<<current->node_type<<" Size "<<list_children->size()<<endl;
 	current->children = *list_children;
 	if(!list_stack.empty()){
 		*list_children = list_stack.top();
@@ -317,7 +315,6 @@ CONTENT:
 										temp->data = str;
 										temp->node_type = STRING_H;
 										content_children->push_back(temp);
-										//cout<<"Pushed "<<str<<endl;
 									}
 		| CONTENT PAR
 		| CONTENT TEXTBF 			{
@@ -347,7 +344,6 @@ TABLE:
 			init_rows_children();
 		}
 		;
-
 
 ROWS:
 		ROWS ROW 

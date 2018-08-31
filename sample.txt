@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 \section{LLASSUN}
 Welcome to LaTeX Base $      $ a webbased editor with live document preview
 Here are some things to try
@@ -95,3 +96,8 @@ kya baat
 \end{tabular}
 
 >>>>>>> AST now includes Tabular
+=======
+Welcome to LaTeX Base a webbased editor with live document preview
+Here are some things to try
+\textbf{this is some \underline{This is}}
+>>>>>>> 1cb3248476a5683f3b43d5053f9557ce81f9f375

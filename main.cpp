@@ -32,9 +32,11 @@ int main(int argc, char *argv[]) {
 	init_rows_children();
 	init_r_content_children();
 	init_cell_children();
+
 	// parse through the input until there is no more:
 	do {
 		yyparse();
 	} while (!feof(yyin));
 	print(root,0);
+
 }
