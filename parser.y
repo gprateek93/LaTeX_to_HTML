@@ -18,12 +18,11 @@ vector<string> labels;
 c_ptrs* section_children;
 c_ptrs* subsection_children;
 c_ptrs* list_children;
-
 c_ptrs* content_children;
 c_ptrs* r_content_children;
 c_ptrs* rows_children;
 c_ptrs* cell_children;
-
+c_ptrs* figure_children;
 
 stack<c_ptrs> content_stack;
 stack<c_ptrs> r_content_stack;
@@ -128,6 +127,14 @@ void make_new_r_content(){
 	init_r_content_children();
 }
 
+void init_figure_children(){
+	figure_children = new vector<ast_node*>();
+}
+
+void adopt_figure_children(ast_node* current){
+	current->children = *figure_children;
+}
+
 %}
 
 %union {
@@ -137,7 +144,7 @@ void make_new_r_content(){
 
 %start START
 
-%type <node> S LIST UNDERLINE TEXTIT TEXTBF TABLE SEC OL UL RESTRICTED_TEXTBF RESTRICTED_TEXTIT RESTRICTED_UNDERLINE ROW DOW
+%type <node> S LIST UNDERLINE TEXTIT TEXTBF TABLE SEC OL UL RESTRICTED_TEXTBF RESTRICTED_TEXTIT RESTRICTED_UNDERLINE ROW DOW FIGURE MATH
 %token <sval> STRING
 %token BEGIN_ITEMIZE END_ITEMIZE
 %token BEGIN_ENUMERATE END_ENUMERATE
@@ -329,9 +336,13 @@ CONTENT:
 		| CONTENT TABLE 			{
 										content_children->push_back($2);
 									}
-		| CONTENT FIGURE
+		| CONTENT FIGURE 			{
+										content_children->push_back($2);
+									}
 		| CONTENT CENTERING
-		| CONTENT MATH
+		| CONTENT MATH 				{
+										content_children->push_back($2);
+									}
 		|
 		;
 
@@ -380,6 +391,9 @@ DOW:
 			cell_children->push_back(temp);
 		}
 		|
+		{
+			;
+		}
 		;
 
 RESTRICTED_CONTENT:
@@ -433,17 +447,34 @@ RESTRICTED_UNDERLINE:
 
 FIGURE:
 		BEGIN_FIGURE FIG_CONTENT END_FIGURE
+		{
+			$$ = new_node();
+
+		}
 		;
 
 FIG_CONTENT:
-		FIG_CONTENT INC_GR
+		FIG_CONTENT INC_GR 			{
+										figure_children->push_back($2);
+									}
 		| FIG_CONTENT CAP
+									{
+										figure_children->push_back($2);
+									}
 		| FIG_CONTENT CENTERING
+									{
+										figure_children->push_back($2);
+									}
 		|
 		;
 
 CAP:
-		CAPTION BEGIN_CURLY RESTRICTED_CONTENT END_CURLY
+		CAPTION BEGIN_CURLY NRC RESTRICTED_CONTENT END_CURLY
+		{
+			$$ = new_node();
+			$$->node_type = CAPTION_H;
+			adopt_r_content_children($$);
+		}
 		;
 
 INC_GR:
