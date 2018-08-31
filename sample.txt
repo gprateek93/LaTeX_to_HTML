@@ -11,6 +11,7 @@ asfduekfewfjewihbkw
 \subsection
 This is lorem ipsum
 \textbf{ eVERYTHING INSIDE THIS IS BOLD
+9)/(*@#*)-*+
 \begin{tabular}{l|c|r|r|r}
 \hline
       1 & 11101 & a\\
