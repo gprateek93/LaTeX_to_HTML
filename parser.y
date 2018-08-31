@@ -2,20 +2,25 @@
 #define YYDEBUG 1
 #include <iostream>
 #include <vector>
+#include <stack>
 #include <cstring>
 #include "ast.h"
 
 using namespace std;
 
+typedef vector<ast_node*> c_ptrs;
+
 extern int yylex();
 extern void yyerror(const char*);
+extern ast_node* root;
 
-vector<ast_node*> *section_children;
-vector<ast_node*> *subsection_children;
-vector<ast_node*> *content_children;
-vector<ast_node*> *list_children;
-vector<ast_node*> *r_content_children;
+c_ptrs* section_children;
+c_ptrs* subsection_children;
+c_ptrs* list_children;
 
+c_ptrs* content_children;
+c_ptrs* r_content_children;
+stack<c_ptrs> st;
 
 void init_content_children(){
 	content_children = new vector<ast_node*>();
@@ -23,6 +28,14 @@ void init_content_children(){
 
 void adopt_content_children(ast_node* current){
 	current->children = *content_children;
+	if(!st.empty()){
+		*content_children = st.top();
+		st.pop();
+	}
+}
+
+void make_new_content(){
+	st.push(*content_children);
 	init_content_children();
 }
 
@@ -74,33 +87,36 @@ void print(ast_node* root){
 
 START:
 		S
-		/*
-			Call LATEX_TO_HTML from here
-			Append content children and section children
-			extern ast_root assign to this
-		*/
+		{
+			root = $1;
+		}
 		;
 
-S:
+S: 
 		CONTENT
 		{
 			$$ = new_node();
-			adopt_content_children($$);
 			$$->node_type = DOCUMENT_H;
-			print($$);
+			adopt_content_children($$);
 		}
 		| S SEC
 		;
 
-SEC:
-		SECTION CONTENT
+DUMMY:	{
+			make_new_content();
+		}
+		;
+
+
+SEC:	
+		SECTION DUMMY CONTENT
 		{
 			ast_node* temp = new_node();
 			adopt_content_children(temp);
 			temp->node_type = SECTION_H;
 			//section_children->push_back(temp);
 		}
-		| SECTION CONTENT SUBSEC
+		| SECTION DUMMY CONTENT SUBSEC
 		{
 			ast_node* temp = new_node();
 			adopt_content_children(temp);
@@ -109,8 +125,14 @@ SEC:
 		}
 		;
 SUBSEC:
-		SUBSEC SUBSECTION CONTENT
-		| SUBSECTION CONTENT
+		SUBSEC SUBSECTION DUMMY CONTENT
+		{
+			//Code to add content in Subsec
+		}
+		| SUBSECTION DUMMY CONTENT
+		{
+			//Code to add content in Subsec
+		}
 		;
 
 LIST:
@@ -137,14 +159,14 @@ UL:
 		;
 
 ITEMS:
-		ITEMS ITEM CONTENT
+		ITEMS ITEM DUMMY CONTENT
 		{
 			ast_node* temp = new_node();
 			adopt_content_children(temp);
 			temp->node_type = ITEM_H;
 			list_children->push_back(temp);
 		}
-		| ITEM CONTENT
+		| ITEM DUMMY CONTENT
 		{
 			ast_node* temp = new_node();
 			adopt_content_children(temp);
@@ -154,7 +176,7 @@ ITEMS:
 		;
 
 TEXTBF:
-		T_BF BEGIN_CURLY CONTENT END_CURLY
+		T_BF BEGIN_CURLY DUMMY CONTENT END_CURLY
 		{
 			$$ = new_node();
 			$$->node_type = TEXTBF_H;
@@ -163,7 +185,7 @@ TEXTBF:
 		;
 
 TEXTIT:
-		T_IT BEGIN_CURLY CONTENT END_CURLY
+		T_IT BEGIN_CURLY DUMMY CONTENT END_CURLY
 		{
 			$$ = new_node();
 			$$->node_type = TEXTIT_H;
@@ -172,7 +194,7 @@ TEXTIT:
 		;
 
 UNDERLINE:
-		T_U BEGIN_CURLY CONTENT END_CURLY
+		T_U BEGIN_CURLY DUMMY CONTENT END_CURLY
 		{
 			$$ = new_node();
 			$$->node_type = UNDERLINE_H;
