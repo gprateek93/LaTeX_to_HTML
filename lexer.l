@@ -65,6 +65,12 @@ OPERATORS [+*\-/^=]
 "\\par"                             {
                                         return PAR;
                                     }
+"\\label"                           {
+                                        return LABEL_TAG;
+                                    }
+"\\ref"                             {
+                                        return REF_TAG;
+                                    }
 
 <INITIAL,ENV_TABULAR>"\\textbf"     {
                                         return T_BF;

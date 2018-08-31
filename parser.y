@@ -171,6 +171,7 @@ void adopt_figure_children(ast_node* current){
 %token AMPERSAND DSLASH
 %token BEGIN_FIGURE BEGIN_SQUARE END_FIGURE END_SQUARE INCLUDE_GRAPHICS CAPTION COMMA
 %token DOLLAR SUMMATION INTEGRAL FRACTION SQUARE_ROOT SUPERSCRIPT SUBSCRIPT
+%token LABEL_TAG REF_TAG
 
 %%
 
@@ -181,7 +182,7 @@ START:
 		}
 		;
 
-S: 
+S:
 		CONTENT
 		{
 			$$ = new_node();
@@ -193,7 +194,7 @@ S:
 			$$ = new_node();
 			$$->node_type = DOCUMENT_H;
 			adopt_section_children($$);
-		}	
+		}
 		;
 
 
@@ -202,18 +203,18 @@ NC:		{
 		}
 		;
 
-NL:		
+NL:
 		{
 			make_new_list();
 		}
 		;
 
-NRC:	
+NRC:
 		{
 			make_new_r_content();
 		}
 
-SEC:	
+SEC:
 		SECTION HEADING NC CONTENT
 		{
 			ast_node* temp = new_node();
@@ -225,7 +226,7 @@ SEC:
 		{
 			ast_node* temp = new_node();
 			adopt_content_children(temp);
-			temp->node_type = SECTION_H;	
+			temp->node_type = SECTION_H;
 			for(int i=0; i<subsection_children->size();i++){
 				temp->children.push_back(subsection_children->at(i));
 			}
@@ -243,7 +244,7 @@ HEADING:
 		{
 			;
 		}
-		;										
+		;
 
 SUBSEC:
 		SUBSEC SUBSECTION HEADING NC CONTENT
@@ -268,8 +269,8 @@ LIST:
 		;
 
 OL:
-		BEGIN_ENUMERATE NL ITEMS END_ENUMERATE 
-		{	
+		BEGIN_ENUMERATE NL ITEMS END_ENUMERATE
+		{
 			$$ = new_node();
 			$$->node_type = ENUMERATE_H;
 			adopt_list_children($$);
@@ -278,7 +279,7 @@ OL:
 
 UL:
 		BEGIN_ITEMIZE NL ITEMS END_ITEMIZE
-		{	
+		{
 			$$ = new_node();
 			$$->node_type = ITEMIZE_H;
 			adopt_list_children($$);
@@ -363,7 +364,16 @@ CONTENT:
 		| CONTENT MATH 				{
 										content_children->push_back($2);
 									}
+		| CONTENT REF
 		|
+		;
+
+LABEL:
+		LABEL_TAG BEGIN_CURLY STRING END_CURLY
+		;
+
+REF:
+		REF_TAG BEGIN_CURLY STRING END_CURLY
 		;
 
 TABLE:
@@ -377,7 +387,7 @@ TABLE:
 		;
 
 ROWS:
-		ROWS ROW 
+		ROWS ROW
 		{
 			rows_children->push_back($2);
 		}
@@ -426,7 +436,7 @@ RESTRICTED_CONTENT:
 														r_content_children->push_back(temp);
 													}
 		| RESTRICTED_CONTENT RESTRICTED_TEXTBF		{
-														r_content_children->push_back($2);				
+														r_content_children->push_back($2);
 													}
 		| RESTRICTED_CONTENT RESTRICTED_TEXTIT		{
 														r_content_children->push_back($2);
@@ -541,16 +551,16 @@ MATH_CONTENT:
 										math_children->push_back(temp);
 									}
 		| MATH_CONTENT SUM          {
-										math_children->push_back($2);	
+										math_children->push_back($2);
 									}
 		| MATH_CONTENT INTG 		{
-										math_children->push_back($2);	
+										math_children->push_back($2);
 									}
 		| MATH_CONTENT FRAC{
-										math_children->push_back($2);	
+										math_children->push_back($2);
 									}
 		| MATH_CONTENT SQRT{
-										math_children->push_back($2);	
+										math_children->push_back($2);
 									}
 		|
 		;
