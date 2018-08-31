@@ -23,6 +23,7 @@ c_ptrs* r_content_children;
 c_ptrs* rows_children;
 c_ptrs* cell_children;
 c_ptrs* figure_children;
+c_ptrs* math_children;
 
 stack<c_ptrs> content_stack;
 stack<c_ptrs> r_content_stack;
@@ -71,6 +72,15 @@ void adopt_section_children(ast_node* current){
 void init_section_children(){
 	section_children = new vector<ast_node*>();
 }
+
+void adopt_math_children(ast_node* current){
+	current->children = *math_children;
+}
+
+void init_math_children(){
+	math_children = new vector<ast_node*>();
+}
+
 
 void adopt_subsection_children(ast_node* current){
 	current->children = *subsection_children;
@@ -144,9 +154,9 @@ void adopt_figure_children(ast_node* current){
 
 %start START
 
-%type <node> S LIST UNDERLINE TEXTIT TEXTBF TABLE SEC OL UL RESTRICTED_TEXTBF RESTRICTED_TEXTIT RESTRICTED_UNDERLINE ROW DOW FIGURE MATH INC_GR CAP
-%type <sval> FIGURE_PATH FIGURE_SPECS
-%token <sval> STRING
+%type <node> S LIST UNDERLINE TEXTIT TEXTBF TABLE SEC OL UL RESTRICTED_TEXTBF RESTRICTED_TEXTIT RESTRICTED_UNDERLINE ROW DOW FIGURE MATH INC_GR CAP SUM INTG FRAC SQRT
+%type <sval> FIGURE_PATH FIGURE_SPECS HEADING
+%token <sval> STRING MATH_STRING FIG_ARGS
 %token BEGIN_ITEMIZE END_ITEMIZE
 %token BEGIN_ENUMERATE END_ENUMERATE
 %token BEGIN_DOCUMENT END_DOCUMENT
@@ -159,8 +169,8 @@ void adopt_figure_children(ast_node* current){
 %token BEGIN_TABULAR END_TABULAR
 %token TABLE_ARGS HLINE
 %token AMPERSAND DSLASH
-%token BEGIN_FIGURE BEGIN_SQUARE END_FIGURE END_SQUARE INCLUDE_GRAPHICS FIG_ARGS CAPTION COMMA
-%token DOLLAR SUMMATION MATH_STRING INTEGRAL FRACTION SQUARE_ROOT SUPERSCRIPT SUBSCRIPT
+%token BEGIN_FIGURE BEGIN_SQUARE END_FIGURE END_SQUARE INCLUDE_GRAPHICS CAPTION COMMA
+%token DOLLAR SUMMATION INTEGRAL FRACTION SQUARE_ROOT SUPERSCRIPT SUBSCRIPT
 
 %%
 
@@ -225,8 +235,14 @@ SEC:
 		;
 
 HEADING:
-		BEGIN_CURLY RESTRICTED_CONTENT END_CURLY
+		BEGIN_CURLY STRING END_CURLY
+		{
+			$$ = $2;
+		}
 		|
+		{
+			;
+		}
 		;										
 
 SUBSEC:
@@ -324,7 +340,11 @@ CONTENT:
 										temp->node_type = STRING_H;
 										content_children->push_back(temp);
 									}
-		| CONTENT PAR
+		| CONTENT PAR				{
+										ast_node* temp = new_node();
+										temp->node_type = PAR_H;
+										content_children->push_back(temp);
+									}
 		| CONTENT TEXTBF 			{
 										content_children->push_back($2);
 									}
@@ -340,7 +360,9 @@ CONTENT:
 		| CONTENT FIGURE 			{
 										content_children->push_back($2);
 									}
-		| CONTENT MATH 				
+		| CONTENT MATH 				{
+										content_children->push_back($2);
+									}
 		|
 		;
 
@@ -485,7 +507,7 @@ INC_GR:
 FIGURE_SPECS:
 		BEGIN_SQUARE FIG_ARGS END_SQUARE
 		{
-			$$ = yylval.sval;
+			$$ = $2;
 		}
 		|
 		{
@@ -502,27 +524,72 @@ FIGURE_PATH:
 		;
 
 MATH:
-		DOLLAR MATH_CONTENT DOLLAR {/*cout << " We Love Math!" << endl;*/;}
+		DOLLAR MATH_CONTENT DOLLAR
+		{
+			$$ = new_node();
+			$$->node_type = MATH_H;
+			adopt_math_children($$);
+		}
 		;
 
 MATH_CONTENT:
-		MATH_CONTENT MATH_STRING
-		| MATH_CONTENT SUM
-		| MATH_CONTENT INTG
-		| MATH_CONTENT FRAC
-		| MATH_CONTENT SQRT
+		MATH_CONTENT MATH_STRING	{
+										ast_node* temp = new_node();
+										string str($2);
+										temp->data = str;
+										temp->node_type = STRING_H;
+										math_children->push_back(temp);
+									}
+		| MATH_CONTENT SUM          {
+										math_children->push_back($2);	
+									}
+		| MATH_CONTENT INTG 		{
+										math_children->push_back($2);	
+									}
+		| MATH_CONTENT FRAC{
+										math_children->push_back($2);	
+									}
+		| MATH_CONTENT SQRT{
+										math_children->push_back($2);	
+									}
 		|
 		;
 SUM:
-		SUMMATION SUBSCRIPT BEGIN_CURLY MATH_CONTENT END_CURLY SUPERSCRIPT BEGIN_CURLY MATH_CONTENT END_CURLY
+		SUMMATION SUBSCRIPT BEGIN_CURLY MATH_STRING END_CURLY SUPERSCRIPT BEGIN_CURLY MATH_STRING END_CURLY
+		{
+			$$ = new_node();
+			$$->node_type = SUM_H;
+			$$->data = $4;
+			$$->attributes = $8;
+
+		}
 		;
 INTG:
-		INTEGRAL SUBSCRIPT BEGIN_CURLY MATH_CONTENT END_CURLY SUPERSCRIPT BEGIN_CURLY MATH_CONTENT END_CURLY
+		INTEGRAL SUBSCRIPT BEGIN_CURLY MATH_STRING END_CURLY SUPERSCRIPT BEGIN_CURLY MATH_STRING END_CURLY
+		{
+			$$ = new_node();
+			$$->node_type = INTG_H;
+			$$->data = $4;
+			$$->attributes = $8;
+
+		}
 		;
 FRAC:
-		FRACTION BEGIN_CURLY MATH_CONTENT END_CURLY BEGIN_CURLY MATH_CONTENT END_CURLY
+		FRACTION BEGIN_CURLY MATH_STRING END_CURLY BEGIN_CURLY MATH_STRING END_CURLY
+		{
+			$$ = new_node();
+			$$->node_type = FRAC_H;
+			$$->data = $3;
+			$$->attributes = $6;
+
+		}
 		;
 SQRT:
-		SQUARE_ROOT BEGIN_CURLY MATH_CONTENT END_CURLY
+		SQUARE_ROOT BEGIN_CURLY MATH_STRING END_CURLY
+		{
+			$$ = new_node();
+			$$->node_type = SQRT_H;
+			$$->data = $3;
+		}
 		;
 %%

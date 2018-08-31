@@ -19,10 +19,10 @@ This is lorem ipsum
       \hline
       3 & \textbf{\textit{23113$  $231}} & c\\
       \hline
-      4 & 25113231 & $  $\\
+      4 & 25113231 & $ \sum_{6}^{t} $\\
       \hline
 \end{tabular}
-}
+
 \subsection
 \begin{figure}
 \includegraphics[height = 1cm]{hello}
