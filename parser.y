@@ -180,24 +180,8 @@ S:
 		}	
 		;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-SEC:
-<<<<<<< HEAD
-		SECTION HEADING CONTENT {/*cout<<"Sec reduced\n";*/ ;}
-		| SECTION HEADING CONTENT SUBSEC {/*cout<<"SEC SUBSEC\n";*/ ;}
-=======
-		SECTION CONTENT
-=======
-DUMMY:	{
-=======
+
 NC:		{
->>>>>>> AST now includes- Section, Subsection, List, Content
-=======
-NC:		
-		{
->>>>>>> AST now includes Tabular
 			make_new_content();
 		}
 		;
@@ -214,19 +198,14 @@ NRC:
 		}
 
 SEC:	
-<<<<<<< HEAD
-		SECTION DUMMY CONTENT
->>>>>>> Fixed bugs, Limited Working AST complete
-=======
-		SECTION NC CONTENT
->>>>>>> AST now includes- Section, Subsection, List, Content
+		SECTION HEADING NC CONTENT
 		{
 			ast_node* temp = new_node();
 			adopt_content_children(temp);
 			temp->node_type = SECTION_H;
 			section_children->push_back(temp);
 		}
-		| SECTION NC CONTENT SUBSEC
+		| SECTION HEADING NC CONTENT SUBSEC
 		{
 			ast_node* temp = new_node();
 			adopt_content_children(temp);
@@ -237,36 +216,28 @@ SEC:
 			section_children->push_back(temp);
 			init_subsection_children();
 		}
->>>>>>> Added AST files. Added AST actions for List, Content, Items. Updated Main and makefile
 		;
-SUBSEC:
-<<<<<<< HEAD
-<<<<<<< HEAD
-		SUBSEC SUBSECTION HEADING CONTENT
-		| SUBSECTION HEADING CONTENT
-		;
+
 HEADING:
-		BEGIN_CURLY RESTRICTED_CONTENT END_CURLY {/*cout << "heading" << endl;*/;}
-		| 										{/*cout << "no heading" << endl;*/; }
-=======
-		SUBSEC SUBSECTION DUMMY CONTENT
-=======
-		SUBSEC SUBSECTION NC CONTENT
->>>>>>> AST now includes- Section, Subsection, List, Content
+		BEGIN_CURLY RESTRICTED_CONTENT END_CURLY
+		|
+		;										
+
+SUBSEC:
+		SUBSEC SUBSECTION HEADING NC CONTENT
 		{
 			ast_node* temp = new_node();
 			temp->node_type = SUBSECTION_H;
 			adopt_content_children(temp);
 			subsection_children->push_back(temp);
 		}
-		| SUBSECTION NC CONTENT
+		| SUBSECTION HEADING NC CONTENT
 		{
 			ast_node* temp = new_node();
 			temp->node_type = SUBSECTION_H;
 			adopt_content_children(temp);
 			subsection_children->push_back(temp);
 		}
->>>>>>> Fixed bugs, Limited Working AST complete
 		;
 
 LIST:
@@ -275,22 +246,7 @@ LIST:
 		;
 
 OL:
-<<<<<<< HEAD
-<<<<<<< HEAD
-		BEGIN_ENUMERATE {/*cout<<"Begin OL\n";*/;}
-		ITEMS
-		END_ENUMERATE {/*cout<<"End OL\n";*/ ;}
-		;
-
-UL:
-		BEGIN_ITEMIZE {/*cout<<"Begin UL\n";*/;}
-		ITEMS
-		END_ITEMIZE {/*cout<<"End UL\n";*/ ;}
-=======
-		BEGIN_ENUMERATE ITEMS END_ENUMERATE 
-=======
 		BEGIN_ENUMERATE NL ITEMS END_ENUMERATE 
->>>>>>> AST now includes- Section, Subsection, List, Content
 		{	
 			$$ = new_node();
 			$$->node_type = ENUMERATE_H;
@@ -305,7 +261,6 @@ UL:
 			$$->node_type = ITEMIZE_H;
 			adopt_list_children($$);
 		}
->>>>>>> Added AST files. Added AST actions for List, Content, Items. Updated Main and makefile
 		;
 
 ITEMS:
@@ -432,14 +387,8 @@ DOW:
 		;
 
 RESTRICTED_CONTENT:
-<<<<<<< HEAD
-		RESTRICTED_CONTENT STRING
-		| RESTRICTED_CONTENT RESTRICTED_TEXTBF
-		| RESTRICTED_CONTENT RESTRICTED_TEXTIT
-		| RESTRICTED_CONTENT RESTRICTED_UNDERLINE
-		| RESTRICTED_CONTENT MATH
-=======
-		RESTRICTED_CONTENT STRING 					{
+		RESTRICTED_CONTENT MATH
+		| RESTRICTED_CONTENT STRING 					{
 														ast_node* temp = new_node();
 														string str($2);
 														temp->data = str;
@@ -456,8 +405,6 @@ RESTRICTED_CONTENT:
 		| RESTRICTED_CONTENT RESTRICTED_UNDERLINE	{
 														r_content_children->push_back($2);
 													}
-
->>>>>>> AST now includes Tabular
 		|
 		;
 
