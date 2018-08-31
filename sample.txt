@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 \section{LLASSUN}
 Welcome to LaTeX Base $      $ a webbased editor with live document preview
 Here are some things to try
@@ -49,3 +50,37 @@ Welcome to LaTeX Base a webbased editor with live document preview
 Here are some things to try
 \textbf{this is some \underline{This is}}
 >>>>>>> Fixed bugs, Limited Working AST complete
+=======
+\section
+content 
+\subsection
+Welcome to LaTeX Base a webb
+ased editor with live document 
+preview
+Here are some things to try
+THis
+\begin{itemize}
+  \item 
+        \begin{enumerate} 
+              \item 
+                    this 
+              \item 
+                  that 
+        \end{enumerate}
+  \item \textbf{}
+\end{itemize}
+\section
+this that
+\subsection
+kya baat
+\begin{itemize}
+  \item 
+        \begin{enumerate} 
+              \item 
+                    this 
+              \item 
+                  that 
+        \end{enumerate}
+  \item \textbf{}
+\end{itemize}
+>>>>>>> AST now includes- Section, Subsection, List, Content

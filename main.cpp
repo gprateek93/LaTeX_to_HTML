@@ -8,7 +8,9 @@ extern int yyparse();
 extern FILE *yyin;
 extern void init_content_children();
 extern void init_list_children();
-extern void print(ast_node*);
+extern void init_section_children();
+extern void init_subsection_children();
+extern void print(ast_node*, int);
 
 ast_node* root;
 
@@ -22,9 +24,11 @@ int main(int argc, char *argv[]) {
 	yyin = fopen(argv[1], "r");
 	init_content_children();
 	init_list_children();
+	init_section_children();
+	init_subsection_children();
 	// parse through the input until there is no more:
 	do {
 		yyparse();
 	} while (!feof(yyin));
-	print(root);
+	print(root,0);
 }

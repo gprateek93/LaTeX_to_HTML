@@ -13,6 +13,7 @@ typedef vector<ast_node*> c_ptrs;
 extern int yylex();
 extern void yyerror(const char*);
 extern ast_node* root;
+vector<string> labels;
 
 c_ptrs* section_children;
 c_ptrs* subsection_children;
@@ -20,22 +21,26 @@ c_ptrs* list_children;
 
 c_ptrs* content_children;
 c_ptrs* r_content_children;
-stack<c_ptrs> st;
+
+stack<c_ptrs> content_stack;
+stack<c_ptrs> list_stack;
 
 void init_content_children(){
 	content_children = new vector<ast_node*>();
 }
 
 void adopt_content_children(ast_node* current){
+	//cout<<"Parent"<<current->node_type<<" Size "<<content_children->size()<<endl;
 	current->children = *content_children;
-	if(!st.empty()){
-		*content_children = st.top();
-		st.pop();
+	if(!content_stack.empty()){
+		*content_children = content_stack.top();
+		content_stack.pop();
 	}
 }
 
 void make_new_content(){
-	st.push(*content_children);
+	//cout<<"New content children\n";
+	content_stack.push(*content_children);
 	init_content_children();
 }
 
@@ -44,17 +49,46 @@ void init_list_children(){
 }
 
 void adopt_list_children(ast_node* current){
+	//cout<<"Parent list "<<current->node_type<<" Size "<<list_children->size()<<endl;
 	current->children = *list_children;
+	if(!list_stack.empty()){
+		*list_children = list_stack.top();
+		list_stack.pop();
+	}
+}
+
+void make_new_list(){
+	//cout<<"New list \n";
+	list_stack.push(*list_children);
 	init_list_children();
 }
 
-void print(ast_node* root){
+void adopt_section_children(ast_node* current){
+	current->children = *section_children;
+}
+
+void init_section_children(){
+	section_children = new vector<ast_node*>();
+}
+
+void adopt_subsection_children(ast_node* current){
+	current->children = *subsection_children;
+}
+
+void init_subsection_children(){
+	subsection_children = new vector<ast_node*>();
+}
+
+void print(ast_node* root, int tabs){
 	if(root == NULL){
 		return;
 	}
+	for(int i=0; i<tabs; i++){
+		cout<<"  ";
+	}
 	cout<<root->node_type<<endl;
 	for(int i=0; i<root->children.size(); i++){
-		print(root->children.at(i));
+		print(root->children.at(i), tabs+1);
 	}
 }
 
@@ -101,8 +135,15 @@ S:
 			adopt_content_children($$);
 		}
 		| S SEC
+		{
+			$$ = new_node();
+			$$->node_type = DOCUMENT_H;
+			//adopt_content_children($$);
+			adopt_section_children($$);
+		}	
 		;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 SEC:
 <<<<<<< HEAD
@@ -112,30 +153,48 @@ SEC:
 		SECTION CONTENT
 =======
 DUMMY:	{
+=======
+NC:		{
+>>>>>>> AST now includes- Section, Subsection, List, Content
 			make_new_content();
+		}
+		;
+
+NL:		{
+			make_new_list();
 		}
 		;
 
 
 SEC:	
+<<<<<<< HEAD
 		SECTION DUMMY CONTENT
 >>>>>>> Fixed bugs, Limited Working AST complete
+=======
+		SECTION NC CONTENT
+>>>>>>> AST now includes- Section, Subsection, List, Content
 		{
 			ast_node* temp = new_node();
 			adopt_content_children(temp);
 			temp->node_type = SECTION_H;
-			//section_children->push_back(temp);
+			section_children->push_back(temp);
 		}
-		| SECTION DUMMY CONTENT SUBSEC
+		| SECTION NC CONTENT SUBSEC
 		{
 			ast_node* temp = new_node();
 			adopt_content_children(temp);
-			temp->node_type = SECTION_H;
-			//section_children->push_back(temp); add subsection part
+			temp->node_type = SECTION_H;	
+			for(int i=0; i<subsection_children->size();i++){
+				temp->children.push_back(subsection_children->at(i));
+			}
+			section_children->push_back(temp);
+			init_subsection_children();
+			//Add code to append subsections_childred to temp->children
 		}
 >>>>>>> Added AST files. Added AST actions for List, Content, Items. Updated Main and makefile
 		;
 SUBSEC:
+<<<<<<< HEAD
 <<<<<<< HEAD
 		SUBSEC SUBSECTION HEADING CONTENT
 		| SUBSECTION HEADING CONTENT
@@ -145,12 +204,23 @@ HEADING:
 		| 										{/*cout << "no heading" << endl;*/; }
 =======
 		SUBSEC SUBSECTION DUMMY CONTENT
+=======
+		SUBSEC SUBSECTION NC CONTENT
+>>>>>>> AST now includes- Section, Subsection, List, Content
 		{
 			//Code to add content in Subsec
+			ast_node* temp = new_node();
+			temp->node_type = SUBSECTION_H;
+			adopt_content_children(temp);
+			subsection_children->push_back(temp);
 		}
-		| SUBSECTION DUMMY CONTENT
+		| SUBSECTION NC CONTENT
 		{
 			//Code to add content in Subsec
+			ast_node* temp = new_node();
+			temp->node_type = SUBSECTION_H;
+			adopt_content_children(temp);
+			subsection_children->push_back(temp);
 		}
 >>>>>>> Fixed bugs, Limited Working AST complete
 		;
@@ -161,6 +231,7 @@ LIST:
 		;
 
 OL:
+<<<<<<< HEAD
 <<<<<<< HEAD
 		BEGIN_ENUMERATE {/*cout<<"Begin OL\n";*/;}
 		ITEMS
@@ -173,6 +244,9 @@ UL:
 		END_ITEMIZE {/*cout<<"End UL\n";*/ ;}
 =======
 		BEGIN_ENUMERATE ITEMS END_ENUMERATE 
+=======
+		BEGIN_ENUMERATE NL ITEMS END_ENUMERATE 
+>>>>>>> AST now includes- Section, Subsection, List, Content
 		{	
 			$$ = new_node();
 			$$->node_type = ENUMERATE_H;
@@ -181,7 +255,7 @@ UL:
 		;
 
 UL:
-		BEGIN_ITEMIZE ITEMS END_ITEMIZE
+		BEGIN_ITEMIZE NL ITEMS END_ITEMIZE
 		{	
 			$$ = new_node();
 			$$->node_type = ITEMIZE_H;
@@ -191,24 +265,24 @@ UL:
 		;
 
 ITEMS:
-		ITEMS ITEM DUMMY CONTENT
+		ITEMS ITEM NC CONTENT
 		{
 			ast_node* temp = new_node();
-			adopt_content_children(temp);
 			temp->node_type = ITEM_H;
+			adopt_content_children(temp);
 			list_children->push_back(temp);
 		}
-		| ITEM DUMMY CONTENT
+		| ITEM NC CONTENT
 		{
 			ast_node* temp = new_node();
-			adopt_content_children(temp);
 			temp->node_type = ITEM_H;
+			adopt_content_children(temp);
 			list_children->push_back(temp);
 		}
 		;
 
 TEXTBF:
-		T_BF BEGIN_CURLY DUMMY CONTENT END_CURLY
+		T_BF BEGIN_CURLY NC CONTENT END_CURLY
 		{
 			$$ = new_node();
 			$$->node_type = TEXTBF_H;
@@ -217,7 +291,7 @@ TEXTBF:
 		;
 
 TEXTIT:
-		T_IT BEGIN_CURLY DUMMY CONTENT END_CURLY
+		T_IT BEGIN_CURLY NC CONTENT END_CURLY
 		{
 			$$ = new_node();
 			$$->node_type = TEXTIT_H;
@@ -226,7 +300,7 @@ TEXTIT:
 		;
 
 UNDERLINE:
-		T_U BEGIN_CURLY DUMMY CONTENT END_CURLY
+		T_U BEGIN_CURLY NC CONTENT END_CURLY
 		{
 			$$ = new_node();
 			$$->node_type = UNDERLINE_H;
@@ -244,6 +318,7 @@ CONTENT:
 										temp->data = str;
 										temp->node_type = STRING_H;
 										content_children->push_back(temp);
+										//cout<<"Pushed "<<str<<endl;
 									}
 		| CONTENT PAR
 		| CONTENT TEXTBF 			{
