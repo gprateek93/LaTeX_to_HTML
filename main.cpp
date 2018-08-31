@@ -8,6 +8,9 @@ extern int yyparse();
 extern FILE *yyin;
 extern void init_content_children();
 extern void init_list_children();
+extern void print(ast_node*);
+
+ast_node* root;
 
 void yyerror(const char *s) {
 	cout<<"Parse error!  Message:"<<s<<endl;
@@ -23,5 +26,5 @@ int main(int argc, char *argv[]) {
 	do {
 		yyparse();
 	} while (!feof(yyin));
-
+	print(root);
 }
