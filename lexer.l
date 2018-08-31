@@ -4,19 +4,24 @@
 #include <iostream>
 #include "parser.tab.h"
 using namespace std;
-
+int prev_state = 0;
+/*0. INITIAL
+1. ENV_TABULAR
+2. ENV_FIGURE
+*/
 
 %}
 %x ENV_TABULAR
 %x TABLE_ARGUMENTS
 %x ENV_FIGURE
-%X FIGURE_ARGUMENTS
+%x FIGURE_ARGUMENTS
+%x MATHMODE
 
 %%
 
 <*>[ \t]+                           ; /* skip whitespace */
 
-<INITIAL,ENV_TABULAR,ENV_FIGURE>\n             ;
+<INITIAL,ENV_TABULAR,ENV_FIGURE>\n  ;
 
 "\\begin{itemize}"                  {
                                         return BEGIN_ITEMIZE;
@@ -81,11 +86,13 @@ using namespace std;
 "\\begin{tabular}"                  {
     									cout<<"Begin tabular\n";
                                         BEGIN(TABLE_ARGUMENTS);
+                                        prev_state = -1;
                                         return BEGIN_TABULAR;
                                     }
 
 <ENV_TABULAR>"\\end{tabular}"       {
                                         BEGIN(INITIAL);
+                                        prev_state = 0;
                                         return END_TABULAR;
 								    }
 
@@ -111,6 +118,7 @@ using namespace std;
 
 <TABLE_ARGUMENTS>"}"                {
                                         BEGIN(ENV_TABULAR);
+                                        prev_state = 1;
                                         return END_CURLY;
                                     }
 
@@ -133,13 +141,15 @@ using namespace std;
     									return STRING;
 								    }
 "\\begin{figure}"                   {
-                                        cout<<"begin figure"<<endl;
+                                        cout << "begin figure" << endl;
                                         BEGIN(ENV_FIGURE);
+                                        prev_state = 2;
                                         return BEGIN_FIGURE;
                                     }
 
 <ENV_FIGURE>"\\end{figure}"         {
                                         BEGIN(INITIAL);
+                                        prev_state = 4;
                                         return END_FIGURE;
                                     }
 
@@ -149,6 +159,7 @@ using namespace std;
 
 <INITIAL,ENV_FIGURE>"["             {
                                         BEGIN(FIGURE_ARGUMENTS);
+                                        prev_state = -1;
                                         return BEGIN_SQUARE;
                                     }
 <INITIAL,ENV_FIGURE>"{"             {
@@ -189,8 +200,30 @@ using namespace std;
 
 <FIGURE_ARGUMENTS>"]"               {
                                         BEGIN(ENV_FIGURE);
+                                        prev_state = 2;
                                         return END_SQUARE;
                                     }
+
+<INITIAL,ENV_TABULAR,ENV_FIGURE>"$" {
+                                        BEGIN(MATHMODE);
+                                        cout << "entered mathmode" << endl;
+                                        return DOLLAR;
+                                    }
+
+<MATHMODE>"$"                       {
+                                        cout << "prev State = " << prev_state << endl;
+                                        cout << "leaving math mode" << endl;
+                                        switch(prev_state)
+                                        {
+                                            case 0: BEGIN(INITIAL); prev_state = 0; break;
+                                            case 1: BEGIN(ENV_TABULAR); prev_state = 1; break;
+                                            case 2: BEGIN(ENV_FIGURE); prev_state = 2; break;
+                                            default: cout << "Error, You shouldn't have entered math mode from here!!" << endl; BEGIN(INITIAL);
+                                        }
+
+                                        return DOLLAR;
+                                    }
+
 
 .                                   {cout<<"...";}
 
