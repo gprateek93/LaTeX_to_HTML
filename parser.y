@@ -144,7 +144,8 @@ void adopt_figure_children(ast_node* current){
 
 %start START
 
-%type <node> S LIST UNDERLINE TEXTIT TEXTBF TABLE SEC OL UL RESTRICTED_TEXTBF RESTRICTED_TEXTIT RESTRICTED_UNDERLINE ROW DOW FIGURE MATH
+%type <node> S LIST UNDERLINE TEXTIT TEXTBF TABLE SEC OL UL RESTRICTED_TEXTBF RESTRICTED_TEXTIT RESTRICTED_UNDERLINE ROW DOW FIGURE MATH INC_GR CAP
+%type <sval> FIGURE_PATH FIGURE_SPECS
 %token <sval> STRING
 %token BEGIN_ITEMIZE END_ITEMIZE
 %token BEGIN_ENUMERATE END_ENUMERATE
@@ -158,7 +159,7 @@ void adopt_figure_children(ast_node* current){
 %token BEGIN_TABULAR END_TABULAR
 %token TABLE_ARGS HLINE
 %token AMPERSAND DSLASH
-%token BEGIN_FIGURE BEGIN_SQUARE END_FIGURE END_SQUARE INCLUDE_GRAPHICS FIG_ARGS CAPTION COMMA CENTERING
+%token BEGIN_FIGURE BEGIN_SQUARE END_FIGURE END_SQUARE INCLUDE_GRAPHICS FIG_ARGS CAPTION COMMA
 %token DOLLAR SUMMATION MATH_STRING INTEGRAL FRACTION SQUARE_ROOT SUPERSCRIPT SUBSCRIPT
 
 %%
@@ -339,10 +340,7 @@ CONTENT:
 		| CONTENT FIGURE 			{
 										content_children->push_back($2);
 									}
-		| CONTENT CENTERING
-		| CONTENT MATH 				{
-										content_children->push_back($2);
-									}
+		| CONTENT MATH 				
 		|
 		;
 
@@ -449,7 +447,8 @@ FIGURE:
 		BEGIN_FIGURE FIG_CONTENT END_FIGURE
 		{
 			$$ = new_node();
-
+			$$->node_type = FIGURE_H;
+			adopt_figure_children($$);
 		}
 		;
 
@@ -458,10 +457,6 @@ FIG_CONTENT:
 										figure_children->push_back($2);
 									}
 		| FIG_CONTENT CAP
-									{
-										figure_children->push_back($2);
-									}
-		| FIG_CONTENT CENTERING
 									{
 										figure_children->push_back($2);
 									}
@@ -479,24 +474,31 @@ CAP:
 
 INC_GR:
 		INCLUDE_GRAPHICS FIGURE_SPECS FIGURE_PATH
+		{
+			$$ = new_node();
+			$$->node_type = INCLUDE_GRAPHICS_H;
+			$$->attributes = $2;
+			$$->data = $3;
+		}
 		;
 
 FIGURE_SPECS:
-		BEGIN_SQUARE DIM END_SQUARE
+		BEGIN_SQUARE FIG_ARGS END_SQUARE
+		{
+			$$ = yylval.sval;
+		}
 		|
-		;
-
-DIM:
-		DIM_R FIG_ARGS
-		;
-
-DIM_R:
-		DIM_R FIG_ARGS COMMA
-		|
+		{
+			string s = "";
+			$$ = strdup(s.c_str());
+		}
 		;
 
 FIGURE_PATH:
 		BEGIN_CURLY STRING END_CURLY
+		{
+			$$ = $2;
+		}
 		;
 
 MATH:

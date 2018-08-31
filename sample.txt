@@ -25,9 +25,7 @@ This is lorem ipsum
 \begin{figure}
 \includegraphics[height = 1cm]{hello}
 \caption{HELLO}
-\centering
 \includegraphics[scale= 1.5, width = 5cm, angle=45]{Randomfigure}
-\centering
 \caption{lop}
 \end{figure}
 Welcome to LaTeX Base a webbased editor with live document preview

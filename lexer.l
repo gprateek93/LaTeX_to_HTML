@@ -177,28 +177,26 @@ OPERATORS [+*\-/^=]
                                         return CAPTION;
                                     }
 
-<INITIAL,ENV_FIGURE>"\\centering"   {
-                                        return CENTERING;
-                                    }
-
-<FIGURE_ARGUMENTS>[a-z=. 0-9]+       {
+<FIGURE_ARGUMENTS>[a-z=. 0-9,]+       {
                                         char *res = new char[strlen(yytext)+1];
                                         strcpy(res, yytext);
+                                        yylval.sval = res;
+                                        return FIG_ARGS;
+                                        /*
                                         string test = "";
                                         int i = 0;
                                         while(res[i]==' '){
                                             i++;
                                         }
-                                        while(res[i]!='=' && res[i]!=' '){
+                                        while(res[i] != '=' && res[i]!=' '){
                                             test+=res[i++];
                                         }
                                         if(test == "width" || test == "height" || test == "scale" || test == "angle"){
+                                            yylval.sval = res;
                                             return FIG_ARGS;
                                         }
-                                    }
+                                        */
 
-<FIGURE_ARGUMENTS>,                 {
-                                        return COMMA;
                                     }
 
 <FIGURE_ARGUMENTS>"]"               {
