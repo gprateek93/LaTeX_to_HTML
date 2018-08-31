@@ -13,11 +13,6 @@ enum AST_Node_Type{
 	DOCUMENT_H, ROW_H, CELL_H
 };
 
-
-/*
-	AST Node Structure
-*/
-
 typedef struct ast_node{
 	AST_Node_Type node_type;
 	string data;
