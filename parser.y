@@ -427,8 +427,10 @@ DOW:
 		;
 
 RESTRICTED_CONTENT:
-		RESTRICTED_CONTENT MATH
-		| RESTRICTED_CONTENT STRING 					{
+		RESTRICTED_CONTENT MATH                     {
+														r_content_children->push_back($2);
+													}
+		| RESTRICTED_CONTENT STRING 				{
 														ast_node* temp = new_node();
 														string str($2);
 														temp->data = str;

@@ -18,8 +18,8 @@ int prev_state = 0;
 %x FIGURE_ARGUMENTS
 %x MATHMODE
 
-OPERATORS [+*\-/^=]
-
+OPERATORS [+*\-\/\^=]
+SPECIAL [\.,\^\-=+#!\(\)?\<\>\*:;@]
 %%
 
 <*>[ \t]+ ; /* skip whitespace */
@@ -143,7 +143,7 @@ OPERATORS [+*\-/^=]
                                         return HLINE;
                                     }
 
-<INITIAL,ENV_TABULAR,ENV_FIGURE>[a-zA-Z0-9 ]*  {
+<INITIAL,ENV_TABULAR,ENV_FIGURE>([a-zA-Z0-9 ]|{SPECIAL})*  {
     									char *res = new char[strlen(yytext) + 1];
     									strcpy(res, yytext);
     									yylval.sval = res;
@@ -270,6 +270,6 @@ OPERATORS [+*\-/^=]
 
 
 
-.                                   {cout<<"...";}
+.                                   {cout<<"...";ECHO;}
 
 %%
