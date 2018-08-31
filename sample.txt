@@ -1,25 +1,13 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-\section{LLASSUN}
-Welcome to LaTeX Base $      $ a webbased editor with live document preview
+\section
+Welcome to LaTeX Base a webbased editor with live document preview
 Here are some things to try
-\subsection{NO LASSUN}
+\subsection
 \begin{itemize}
   \item edit the document name above by typing in the input field
-  \item make changes to $  $ $  $ the body on the left and watch the preview update
-  \item include an image by url like this one
-  \item check the compiler output by clicking the log button $ \sqrt{x^2} $
-  \item format a mathematical expression like
-  \item \textbf{download} the document \underline{as} a pdf by selecting Export Local
-        Filesystem or by clicking the desktop download button
-  \item export your work to Dropbox or Google Drive
-  \item import an existing document from your local computer
-  \item try using the vim or emacs keyboard shortcuts
 \end{itemize}
 \section{}
-Lorem Ipsum $  $lorem ipsum
-\subsection{SOMETHING$x^2$}
+Lorem Ipsum lorem ipsum
+\subsection
 This is lorem ipsum
 \textbf{ eVERYTHING INSIDE THIS IS BOLD
 \begin{tabular}{l|c|r|r|r}
@@ -35,23 +23,17 @@ This is lorem ipsum
 \end{tabular}
 }
 
-$\frac{\sum_{i=0}^{n}x^2}{\int_{2}^{qw3} x^2 dx}$
-\centering
-This will change the justification to center
 \begin{figure}
 \includegraphics[height = 1cm]{hello}
-\caption{HELLO$  $}
+\caption{HELLO}
 \centering
 \includegraphics[scale= 1.5, width = 5cm, angle=45]{Randomfigure}
 \centering
 \caption{lop}
 \end{figure}
-=======
 Welcome to LaTeX Base a webbased editor with live document preview
 Here are some things to try
 \textbf{this is some \underline{This is}}
->>>>>>> Fixed bugs, Limited Working AST complete
-=======
 \section
 content 
 \subsection
@@ -71,7 +53,6 @@ THis
   \item \textbf{}
 \end{itemize}
 \section
-<<<<<<< HEAD
 this that
 \subsection
 kya baat
@@ -85,8 +66,6 @@ kya baat
         \end{enumerate}
   \item \textbf{}
 \end{itemize}
->>>>>>> AST now includes- Section, Subsection, List, Content
-=======
 \begin{tabular}{|c|c|}
      \hline
      first & \textbf{\textit{second}}\\
@@ -95,9 +74,3 @@ kya baat
      \hline
 \end{tabular}
 
->>>>>>> AST now includes Tabular
-=======
-Welcome to LaTeX Base a webbased editor with live document preview
-Here are some things to try
-\textbf{this is some \underline{This is}}
->>>>>>> 1cb3248476a5683f3b43d5053f9557ce81f9f375
