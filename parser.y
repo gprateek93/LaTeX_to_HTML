@@ -21,8 +21,12 @@ c_ptrs* list_children;
 
 c_ptrs* content_children;
 c_ptrs* r_content_children;
+c_ptrs* rows_children;
+c_ptrs* cell_children;
+
 
 stack<c_ptrs> content_stack;
+stack<c_ptrs> r_content_stack;
 stack<c_ptrs> list_stack;
 
 void init_content_children(){
@@ -79,6 +83,22 @@ void init_subsection_children(){
 	subsection_children = new vector<ast_node*>();
 }
 
+void adopt_rows_children(ast_node* current){
+	current->children = *rows_children;
+}
+
+void init_rows_children(){
+	rows_children = new vector<ast_node*>();
+}
+
+void adopt_cell_children(ast_node* current){
+	current->children = *cell_children;
+}
+
+void init_cell_children(){
+	cell_children = new vector<ast_node*>();
+}
+
 void print(ast_node* root, int tabs){
 	if(root == NULL){
 		return;
@@ -92,6 +112,24 @@ void print(ast_node* root, int tabs){
 	}
 }
 
+void init_r_content_children(){
+	r_content_children = new vector<ast_node*>();
+}
+
+void adopt_r_content_children(ast_node* current){
+	current->children = *r_content_children;
+	if(!r_content_stack.empty()){
+		*r_content_children = r_content_stack.top();
+		r_content_stack.pop();
+	}
+}
+
+void make_new_r_content(){
+	//cout<<"New content children\n";
+	r_content_stack.push(*r_content_children);
+	init_r_content_children();
+}
+
 %}
 
 %union {
@@ -101,7 +139,7 @@ void print(ast_node* root, int tabs){
 
 %start START
 
-%type <node> S LIST UNDERLINE TEXTIT TEXTBF TABLE SEC OL UL
+%type <node> S LIST UNDERLINE TEXTIT TEXTBF TABLE SEC OL UL RESTRICTED_TEXTBF RESTRICTED_TEXTIT RESTRICTED_UNDERLINE ROW DOW
 %token <sval> STRING
 %token BEGIN_ITEMIZE END_ITEMIZE
 %token BEGIN_ENUMERATE END_ENUMERATE
@@ -138,11 +176,11 @@ S:
 		{
 			$$ = new_node();
 			$$->node_type = DOCUMENT_H;
-			//adopt_content_children($$);
 			adopt_section_children($$);
 		}	
 		;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 SEC:
@@ -156,15 +194,24 @@ DUMMY:	{
 =======
 NC:		{
 >>>>>>> AST now includes- Section, Subsection, List, Content
+=======
+NC:		
+		{
+>>>>>>> AST now includes Tabular
 			make_new_content();
 		}
 		;
 
-NL:		{
+NL:		
+		{
 			make_new_list();
 		}
 		;
 
+NRC:	
+		{
+			make_new_r_content();
+		}
 
 SEC:	
 <<<<<<< HEAD
@@ -189,7 +236,6 @@ SEC:
 			}
 			section_children->push_back(temp);
 			init_subsection_children();
-			//Add code to append subsections_childred to temp->children
 		}
 >>>>>>> Added AST files. Added AST actions for List, Content, Items. Updated Main and makefile
 		;
@@ -208,7 +254,6 @@ HEADING:
 		SUBSEC SUBSECTION NC CONTENT
 >>>>>>> AST now includes- Section, Subsection, List, Content
 		{
-			//Code to add content in Subsec
 			ast_node* temp = new_node();
 			temp->node_type = SUBSECTION_H;
 			adopt_content_children(temp);
@@ -216,7 +261,6 @@ HEADING:
 		}
 		| SUBSECTION NC CONTENT
 		{
-			//Code to add content in Subsec
 			ast_node* temp = new_node();
 			temp->node_type = SUBSECTION_H;
 			adopt_content_children(temp);
@@ -344,43 +388,104 @@ TABLE:
 		{
 			$$ = new_node();
 			$$->node_type = TABULAR_H;
+			adopt_rows_children($$);
+			init_rows_children();
 		}
 		;
 
 
 ROWS:
-		ROWS ROW
+		ROWS ROW 
+		{
+			rows_children->push_back($2);
+		}
 		| ROW
+		{
+			rows_children->push_back($1);
+		}
 		;
 
 ROW:
-		DOW RESTRICTED_CONTENT DSLASH HLINE
+		DOW NRC RESTRICTED_CONTENT DSLASH HLINE
+		{
+			ast_node* temp = new_node();
+			temp->node_type = CELL_H;
+			adopt_r_content_children(temp);
+			cell_children->push_back(temp);
+			$$ = new_node();
+			$$->node_type = ROW_H;
+			adopt_cell_children($$);
+			init_cell_children();
+
+		}
 		;
 
 DOW:
-		DOW RESTRICTED_CONTENT AMPERSAND
+		DOW NRC RESTRICTED_CONTENT AMPERSAND
+		{
+			ast_node* temp = new_node();
+			temp->node_type = CELL_H;
+			adopt_r_content_children(temp);
+			cell_children->push_back(temp);
+		}
 		|
 		;
 
 RESTRICTED_CONTENT:
+<<<<<<< HEAD
 		RESTRICTED_CONTENT STRING
 		| RESTRICTED_CONTENT RESTRICTED_TEXTBF
 		| RESTRICTED_CONTENT RESTRICTED_TEXTIT
 		| RESTRICTED_CONTENT RESTRICTED_UNDERLINE
 		| RESTRICTED_CONTENT MATH
+=======
+		RESTRICTED_CONTENT STRING 					{
+														ast_node* temp = new_node();
+														string str($2);
+														temp->data = str;
+														temp->node_type = STRING_H;
+														r_content_children->push_back(temp);
+													}
+		| RESTRICTED_CONTENT RESTRICTED_TEXTBF		{
+														r_content_children->push_back($2);				
+													}
+		| RESTRICTED_CONTENT RESTRICTED_TEXTIT		{
+														r_content_children->push_back($2);
+													}
+
+		| RESTRICTED_CONTENT RESTRICTED_UNDERLINE	{
+														r_content_children->push_back($2);
+													}
+
+>>>>>>> AST now includes Tabular
 		|
 		;
 
 RESTRICTED_TEXTBF:
-		T_BF BEGIN_CURLY RESTRICTED_CONTENT END_CURLY
+		T_BF BEGIN_CURLY NRC RESTRICTED_CONTENT END_CURLY
+		{
+			$$ = new_node();
+			$$->node_type = TEXTBF_H;
+			adopt_r_content_children($$);
+		}
 		;
 
 RESTRICTED_TEXTIT:
-		T_IT BEGIN_CURLY RESTRICTED_CONTENT END_CURLY
+		T_IT BEGIN_CURLY NRC RESTRICTED_CONTENT END_CURLY
+		{
+			$$ = new_node();
+			$$->node_type = TEXTIT_H;
+			adopt_r_content_children($$);
+		}
 		;
 
 RESTRICTED_UNDERLINE:
-		T_U BEGIN_CURLY RESTRICTED_CONTENT END_CURLY
+		T_U BEGIN_CURLY NRC RESTRICTED_CONTENT END_CURLY
+		{
+			$$ = new_node();
+			$$->node_type = UNDERLINE_H;
+			adopt_r_content_children($$);
+		}
 		;
 
 FIGURE:

@@ -70,6 +70,7 @@ THis
   \item \textbf{}
 \end{itemize}
 \section
+<<<<<<< HEAD
 this that
 \subsection
 kya baat
@@ -84,3 +85,13 @@ kya baat
   \item \textbf{}
 \end{itemize}
 >>>>>>> AST now includes- Section, Subsection, List, Content
+=======
+\begin{tabular}{|c|c|}
+     \hline
+     first & \textbf{\textit{second}}\\
+     \hline
+     third & fourth\\
+     \hline
+\end{tabular}
+
+>>>>>>> AST now includes Tabular
