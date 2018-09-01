@@ -28,12 +28,12 @@ converter :: converter(){
     myMapping[6] = "em";
     myMapping[7] = "u";
     myMapping[8] = "br";
-    myMapping[9] = "";
-    myMapping[10] = "";
+    myMapping[9] = "a";
+    myMapping[10] = "a";
     myMapping[11] = "table";
     myMapping[12] = "figure";
     myMapping[13] = "img";
-    myMapping[14] = "caption";
+    myMapping[14] = "figcaption";
     myMapping[15] = "";
     myMapping[16] = "body";
     myMapping[17] = "tr";
@@ -84,6 +84,15 @@ string converter :: traversePara(ast_node * root, int type){
 
 string converter :: traverseAnchor(ast_node * root, int type){
     string s = "";
+    if(type == 9){
+        //label
+        s += "<a name=\"" + root->data + "\"/>";
+    }
+    else{
+        //ref
+        s += "<a href=\"#" + root->data + "\">" + root->data + "</a>";
+    }
+    s += traverseChildren(root);
     return s;
 }
 
@@ -110,8 +119,7 @@ string converter :: traverseContent(ast_node * root, int type){
 string converter :: traverseMath(ast_node *root, int type){
     string s = "";
     if(type == 22 || type == 23){
-        cout<<"here"<<endl;
-        s+="<sub>" + root->data + "</sub>" + getMapping(type) + "<sup>" + root->data + "</sup>";
+        s+="<sub>" + root->data + "</sub>" + getMapping(type) + "<sup>" + root->attributes + "</sup>";
     }
     else if(type == 20){
         s+=getMapping(type)+root->data;

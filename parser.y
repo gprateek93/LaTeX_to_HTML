@@ -29,122 +29,6 @@ stack<c_ptrs> content_stack;
 stack<c_ptrs> r_content_stack;
 stack<c_ptrs> list_stack;
 
-void init_content_children(){
-	content_children = new vector<ast_node*>();
-}
-
-void adopt_content_children(ast_node* current){
-	current->children = *content_children;
-	if(!content_stack.empty()){
-		*content_children = content_stack.top();
-		content_stack.pop();
-
-	}
-}
-
-void make_new_content(){
-	content_stack.push(*content_children);
-	init_content_children();
-}
-
-void init_list_children(){
-	list_children = new vector<ast_node*>();
-}
-
-void adopt_list_children(ast_node* current){
-	current->children = *list_children;
-	if(!list_stack.empty()){
-		*list_children = list_stack.top();
-		list_stack.pop();
-	}
-}
-
-void make_new_list(){
-	//cout<<"New list \n";
-	list_stack.push(*list_children);
-	init_list_children();
-}
-
-void adopt_section_children(ast_node* current){
-	current->children = *section_children;
-}
-
-void init_section_children(){
-	section_children = new vector<ast_node*>();
-}
-
-void adopt_math_children(ast_node* current){
-	current->children = *math_children;
-}
-
-void init_math_children(){
-	math_children = new vector<ast_node*>();
-}
-
-
-void adopt_subsection_children(ast_node* current){
-	current->children = *subsection_children;
-}
-
-void init_subsection_children(){
-	subsection_children = new vector<ast_node*>();
-}
-
-void adopt_rows_children(ast_node* current){
-	current->children = *rows_children;
-}
-
-void init_rows_children(){
-	rows_children = new vector<ast_node*>();
-}
-
-void adopt_cell_children(ast_node* current){
-	current->children = *cell_children;
-}
-
-void init_cell_children(){
-	cell_children = new vector<ast_node*>();
-}
-
-void print(ast_node* root, int tabs){
-	if(root == NULL){
-		return;
-	}
-	for(int i=0; i<tabs; i++){
-		cout<<"  ";
-	}
-	cout<<root->node_type<<endl;
-	for(int i=0; i<root->children.size(); i++){
-		print(root->children.at(i), tabs+1);
-	}
-}
-
-void init_r_content_children(){
-	r_content_children = new vector<ast_node*>();
-}
-
-void adopt_r_content_children(ast_node* current){
-	current->children = *r_content_children;
-	if(!r_content_stack.empty()){
-		*r_content_children = r_content_stack.top();
-		r_content_stack.pop();
-	}
-}
-
-void make_new_r_content(){
-	//cout<<"New content children\n";
-	r_content_stack.push(*r_content_children);
-	init_r_content_children();
-}
-
-void init_figure_children(){
-	figure_children = new vector<ast_node*>();
-}
-
-void adopt_figure_children(ast_node* current){
-	current->children = *figure_children;
-}
-
 %}
 
 %union {
@@ -154,12 +38,12 @@ void adopt_figure_children(ast_node* current){
 
 %start START
 
-%type <node> S LIST UNDERLINE TEXTIT TEXTBF TABLE SEC OL UL RESTRICTED_TEXTBF RESTRICTED_TEXTIT RESTRICTED_UNDERLINE ROW DOW FIGURE MATH INC_GR CAP SUM INTG FRAC SQRT
+%type <node> S LIST UNDERLINE TEXTIT TEXTBF TABLE SEC OL UL RESTRICTED_TEXTBF RESTRICTED_TEXTIT RESTRICTED_UNDERLINE ROW DOW FIGURE MATH INC_GR CAP SUM INTG FRAC SQRT LABEL REF
 %type <sval> FIGURE_PATH FIGURE_SPECS HEADING
 %token <sval> STRING MATH_STRING FIG_ARGS
 %token BEGIN_ITEMIZE END_ITEMIZE
 %token BEGIN_ENUMERATE END_ENUMERATE
-%token BEGIN_DOCUMENT END_DOCUMENT
+%token BEGIN_DOCUMENT END_DOCUMENT PREAMBLE
 %token SECTION SUBSECTION
 %token PAR
 %token ITEM
@@ -176,9 +60,9 @@ void adopt_figure_children(ast_node* current){
 %%
 
 START:
-		S
+		PREAMBLE BEGIN_DOCUMENT S END_DOCUMENT
 		{
-			root = $1;
+			root = $3;
 		}
 		;
 
@@ -220,6 +104,7 @@ SEC:
 			ast_node* temp = new_node();
 			adopt_content_children(temp);
 			temp->node_type = SECTION_H;
+			temp->data = $2;
 			section_children->push_back(temp);
 		}
 		| SECTION HEADING NC CONTENT SUBSEC
@@ -227,6 +112,7 @@ SEC:
 			ast_node* temp = new_node();
 			adopt_content_children(temp);
 			temp->node_type = SECTION_H;
+			temp->data = $2;
 			for(int i=0; i<subsection_children->size();i++){
 				temp->children.push_back(subsection_children->at(i));
 			}
@@ -242,7 +128,8 @@ HEADING:
 		}
 		|
 		{
-			;
+			string s = "";
+			$$ = strdup(s.c_str());
 		}
 		;
 
@@ -252,6 +139,7 @@ SUBSEC:
 			ast_node* temp = new_node();
 			temp->node_type = SUBSECTION_H;
 			adopt_content_children(temp);
+			temp->data = $3;
 			subsection_children->push_back(temp);
 		}
 		| SUBSECTION HEADING NC CONTENT
@@ -259,6 +147,7 @@ SUBSEC:
 			ast_node* temp = new_node();
 			temp->node_type = SUBSECTION_H;
 			adopt_content_children(temp);
+			temp->data = $2;
 			subsection_children->push_back(temp);
 		}
 		;
@@ -364,16 +253,31 @@ CONTENT:
 		| CONTENT MATH 				{
 										content_children->push_back($2);
 									}
-		| CONTENT REF
+		| CONTENT REF 				{
+										content_children->push_back($2);
+									}
+		| CONTENT LABEL 			{
+										content_children->push_back($2);
+									}
 		|
 		;
 
 LABEL:
 		LABEL_TAG BEGIN_CURLY STRING END_CURLY
+		{
+			$$ = new_node();
+			$$->node_type = LABEL_H;
+			$$->data = $3;
+		}
 		;
 
 REF:
 		REF_TAG BEGIN_CURLY STRING END_CURLY
+		{
+			$$ = new_node();
+			$$->node_type = REF_H;
+			$$->data = $3;
+		}
 		;
 
 TABLE:
@@ -541,6 +445,7 @@ MATH:
 			$$ = new_node();
 			$$->node_type = MATH_H;
 			adopt_math_children($$);
+			init_math_children();
 		}
 		;
 

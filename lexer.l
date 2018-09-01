@@ -18,13 +18,18 @@ int prev_state = 0;
 %x FIGURE_ARGUMENTS
 %x MATHMODE
 
-OPERATORS [+*\-\/\^=]
-SPECIAL [\.,\^\-=+#!\(\)?\<\>\*:;@]
+OPERATORS [+*\-\/\^=\(\)]
+SPECIAL [\.,\^\-=+#!\(\)?\<\>\*:;@\']
 %%
 
 <*>[ \t]+ ; /* skip whitespace */
 
 <INITIAL,ENV_TABULAR,ENV_FIGURE>\n  ;
+
+
+"\\documentclass[sigconf]{acmart}\n\\usepackage{balance}\n\\usepackage{graphicx}\n\\usepackage{url}\n\\usepackage{amsmath}\n\\usepackage{mathtools}\n\\usepackage{tabularx}\n\\usepackage{caption}\n\\usepackage{subcaption}\n\\usepackage{multirow}\n\\usepackage{graphics}"           {
+                                        return PREAMBLE;
+                                    }
 
 "\\begin{itemize}"                  {
                                         return BEGIN_ITEMIZE;
@@ -42,7 +47,7 @@ SPECIAL [\.,\^\-=+#!\(\)?\<\>\*:;@]
                                         return END_ENUMERATE;
                                     }
 
-"\\begin{document}"                 {
+"\\begin{document}"                 {   
                                         return BEGIN_DOCUMENT;
                                     }
 
@@ -186,23 +191,21 @@ SPECIAL [\.,\^\-=+#!\(\)?\<\>\*:;@]
 <FIGURE_ARGUMENTS>[a-z=. 0-9,]+       {
                                         char *res = new char[strlen(yytext)+1];
                                         strcpy(res, yytext);
-                                        yylval.sval = res;
+                                        char *fin = new char[strlen(yytext)+1];
+                                        int i =0 , k=0;
+                                        while(res[i] != '\0'){
+                                            if(res[i] == 'c' && res[i + 1] == 'm')
+                                                i = i + 2;
+                                            else if(res[i] == ','){
+                                                i++;
+                                            }
+                                            else
+                                                fin[k++] = res[i++];
+                                        }
+                                        fin[k] = 0;
+                                        yylval.sval = fin;
+                                        
                                         return FIG_ARGS;
-                                        /*
-                                        string test = "";
-                                        int i = 0;
-                                        while(res[i]==' '){
-                                            i++;
-                                        }
-                                        while(res[i] != '=' && res[i]!=' '){
-                                            test+=res[i++];
-                                        }
-                                        if(test == "width" || test == "height" || test == "scale" || test == "angle"){
-                                            yylval.sval = res;
-                                            return FIG_ARGS;
-                                        }
-                                        */
-
                                     }
 
 <FIGURE_ARGUMENTS>"]"               {
@@ -270,6 +273,6 @@ SPECIAL [\.,\^\-=+#!\(\)?\<\>\*:;@]
 
 
 
-.                                   {cout<<"...";ECHO;}
+.                                   {;}
 
 %%
