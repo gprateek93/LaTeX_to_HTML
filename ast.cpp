@@ -16,9 +16,9 @@ extern vector<ast_node*>* cell_children;
 extern vector<ast_node*>* figure_children;
 extern vector<ast_node*>* math_children;
 
-extern stack<vector<ast_node*>> content_stack;
-extern stack<vector<ast_node*>> r_content_stack;
-extern stack<vector<ast_node*>> list_stack;
+extern stack<vector<ast_node*> > content_stack;
+extern stack<vector<ast_node*> > r_content_stack;
+extern stack<vector<ast_node*> > list_stack;
 
 ast_node* new_node(){
 	ast_node* temp = new ast_node;
