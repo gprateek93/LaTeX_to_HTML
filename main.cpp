@@ -29,7 +29,7 @@ void yyerror(const char *s) {
 
 int main(int argc, char *argv[]) {
 	if(argc<2){
-		cout<<"error in entering arguments. Correct Format: /compiler <input.txt>";
+		cout<<"error in entering arguments. Correct Format: ./compiler <input.txt>";
 	}
 	yyin = fopen(argv[1], "r");
 	init_content_children();
