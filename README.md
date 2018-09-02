@@ -30,4 +30,4 @@ In the terminal:<br>
 1. cd LaTeX_to_HTML<br>
 2. make clean<br>
 3. make<br>
-4. ./compiler sample.txt<br>
+4. ./compiler sample.tex<br>
